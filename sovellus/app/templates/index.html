@@ -1,0 +1,35 @@
+<html>
+<head>
+  <title>Main Page</title>  
+</head>
+<body>
+  <h1>Tervetuloa Sporttipäiväkirjaan!</h1>
+    <h2> Voit sovelluksessa luoda merkintöjä urheilusuorituksista ja  tarkastella + kommentoida muiden suorituksia  </h2>
+    <h3> Aloita luomalla tunnus tai kirjautumalla sisään! </h3>
+    {% if session.username %}
+  <p>
+    Olet kirjautunut nimellä {{ session.username }}
+  </p>
+  <p>
+    <a href="/logout">Kirjaudu ulos</a>
+    <p><a href="/user_page">Omat sivut</a></p>
+  </p>
+  {% else %}
+  <h1>Kirjaudu tai rekisteröidy jatkaaksesi</h1>
+    <p><a href="/register">Rekisteröidy</a></p>
+  <form action="/login" method="post">
+    <p>
+      Tunnus: <br />
+      <input type="text" name="username" />
+    </p>
+    <p>
+      Salasana: <br />
+      <input type="password" name="password" />
+    </p>
+    <input type="submit" value="Kirjaudu" />
+  </form>
+  {% endif %}
+    
+
+</body>
+</html>

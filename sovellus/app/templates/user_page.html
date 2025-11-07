@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% if username %}
+        <title>Käyttäjän {{ username }} sivu</title>
+        {% else %}
+        <title>Käyttäjäsivu</title>
+        {% endif %}
+    </head>
+    <body>
+
+        {% if username %}
+            <h1>Tervetuloa, {{ username }}!</h1>
+        {% else %}
+            <h1>Sinun pitää kirjautua sisään nähdäksesi tämän sivun.</h1> <!--this should not be seen -->
+        {% endif %}
+
+    </body>
+</html>
+  
