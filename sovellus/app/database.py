@@ -20,9 +20,10 @@ class Database:
             CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY,
                 content TEXT,
+                title TEXT,
                 sent_at TEXT,
-                user_id INTEGER REFERENCES users,
-                thread_id INTEGER REFERENCES threads
+                workout_level TEXT,
+                user_id INTEGER REFERENCES users
            );
         """)
         
@@ -44,11 +45,11 @@ class Database:
         """)
         self.connection.commit()
         
-    def add_message(self,content, sent_at, user_id, thread_id):
+    def add_message(self,content, sent_at, user_id, title, workout_level):
         self.cursor.execute("""
-            INSERT INTO messages (content, sent_at, user_id, thread_id)
-            VALUES (?, ?, ?, ?)
-        """, (content, sent_at, user_id, thread_id))
+            INSERT INTO messages (content, sent_at, user_id, title, workout_level)
+            VALUES (?, ?, ?, ?, ?)
+        """, (content, sent_at, user_id, title, workout_level))
         self.connection.commit()
         
     def get_messages(self):
@@ -64,6 +65,10 @@ class Database:
         
     def get_user(self, username):
         self.cursor.execute("SELECT username, password_hash FROM users WHERE username = ?", (username,))
+        return self.cursor.fetchone()
+    #contains user id now
+    def get_user_by_id(self, username):
+        self.cursor.execute("SELECT id, username, password_hash FROM users WHERE username = ?", (username,))
         return self.cursor.fetchone()
         
     

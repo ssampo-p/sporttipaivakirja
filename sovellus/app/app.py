@@ -4,6 +4,7 @@ from flask import redirect, render_template, request, session, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.database import Database
 from . import config
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -22,9 +23,10 @@ def login():
     
     try:
         db = Database()
-        user = db.get_user(username)
-        if user and check_password_hash(user[1], password):
+        user = db.get_user_by_id(username)
+        if user and check_password_hash(user[2], password):
             session["username"] = username
+            session["user_id"] = user[0]
             return redirect("/")
             
         else:
@@ -68,3 +70,24 @@ def own_page():
         return redirect("/")
     username = session["username"]
     return render_template("user_page.html", username=username)
+
+@app.route("/new_workout_post", methods=["POST"])
+def new_workout_post():
+    ''' Create a new workout post '''
+    if "user_id" not in session:
+        return redirect("/")
+    
+    content = request.form["content"]
+    user_id = session["user_id"]
+    sent_at = datetime.now()
+    title = request.form["title"]
+    workout_level = request.form["workout_level"]
+    
+    try:
+        db = Database()
+        db.add_message(content, sent_at, user_id, title, workout_level)
+    
+        print(f"New workout post by user_id {user_id}: {content} at {sent_at} with title {title}, level {workout_level}")
+        return redirect("/")
+    except Exception as e:
+        return f"error: {e}"

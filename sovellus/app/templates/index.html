@@ -14,6 +14,41 @@
     <a href="/logout">Kirjaudu ulos</a>
     <p><a href="/user_page">Omat sivut</a></p>
   </p>
+  {% if session.username %}
+  <h2>Luo uusi urheilusuoritus</h2>
+  <form action="/new_workout_post" method="post">
+     <fieldset>
+        <legend> Uusi Urheilusuoritus</legend>
+          <p>
+            Otsikko: <br />
+            <input type="text" name="title" />
+          </p>
+          <p>
+            Viesti: <br />
+            <textarea name="content" rows="7" cols="50"></textarea>
+          </p>
+   
+          <fieldset>
+            <legend>Valitse suorituksen taso:</legend>
+            <div>
+              <input type="radio"  name="workout_level" value="helppo" checked/>
+              <label for="helppo">Helppo</label>
+            </div>
+          
+            <div>
+              <input type="radio"  name="workout_level" value="keskitaso" />
+              <label for="keskitaso">Keskitaso</label>
+            </div>
+          
+            <div>
+              <input type="radio" name="workout_level" value="kova" />
+              <label for="kova">Kova</label>        
+            </div>
+          </fieldset>
+          <input type="submit" value="Lähetä" />  
+    </fieldset>
+ </form>
+  {% endif %}
   {% else %}
   <h1>Kirjaudu tai rekisteröidy jatkaaksesi</h1>
     <p><a href="/register">Rekisteröidy</a></p>
