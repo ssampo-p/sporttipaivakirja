@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+{%include "_header.html"%}
+<body>
+    {%if session.user_id%}
+    <h1>Kaikki urheilusuoritukset</h1>
+
+    {% for workout in workouts %}
+        <fieldset>
+            <legend>{{workout.title}}</legend>
+        <div>
+            <h3>{{ workout.title }} (Taso: {{ workout.workout_level }})</h3>
+            <p>{{ workout.content }}</p>
+            <small>Lisätty: {{ workout.sent_at }} Käyttäjältä {{ workout.username }}</small>
+
+
+            <form method="post" action="{{ url_for("comment_post", workout_id=workout.id) }}">
+                <textarea name="comment_content" rows="4" cols="50"></textarea><br>
+                <input type="submit" value="Lähetä kommentti">
+            </form>
+            <div>
+                <h4>Kommentit:</h4>
+                {% for comment in workout.get_comments() %}
+                    <div>
+                        <p>{{ comment[0] }}</p>
+                        <small>Käyttäjältä: {{ comment[1] }}</small>
+                    </div>
+                {% endfor %}
+
+        </div>
+        </fieldset>
+    {% endfor %}
+
+    {% else %}
+    <h1>Kirjaudu tai rekisteröidy jatkaaksesi</h1>
+    <p><a href="/register">Rekisteröidy</a></p>
+    {% endif %}
+</body>
+</html>
+

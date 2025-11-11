@@ -1,0 +1,22 @@
+{%block head%}
+<head>
+  <title>Main Page</title>  
+   <h1>Tervetuloa Sporttipäiväkirjaan!</h1>
+    <a href="{{ url_for("sivu1") }}">
+      <button > Etusivu </button>
+    </a>
+
+    <a href="{{ url_for("workouts") }}">
+      <button>Kaikki urheilusuoritukset</button>
+    </a>
+    {%if session.user_id %}
+    <a href="{{ url_for("own_page", user_id=session["user_id"]) }}">
+      <button>Omat sivut</button>
+    </a>
+    {% endif %}
+    
+
+    <hr>
+  
+  </head>
+{% endblock %}

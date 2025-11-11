@@ -5,6 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.database import Database
 from . import config
 from datetime import datetime
+from app.workout import Workout
+
 
 
 app = Flask(__name__)
@@ -38,6 +40,7 @@ def login():
 @app.route("/logout")
 def logout():
     del session["username"]
+    del session["user_id"]
     return redirect("/")
 
 
@@ -58,18 +61,35 @@ def create():
     try:
         db = Database()
         db.add_user(username, password_hash)
+        db.close()
     except sqlite3.IntegrityError:
         return "VIRHE: tunnus on jo varattu"
 
     return "Tunnus luotu"
 
-@app.route("/user_page")
-def own_page():
+@app.route("/user_page/<int:user_id>")
+def own_page(user_id):
     ''' User's own page , can be accessed only when logged in '''
     if "username" not in session:
         return redirect("/")
+    user_id = session["username"]
     username = session["username"]
-    return render_template("user_page.html", username=username)
+    try:
+        db = Database()
+        workouts_from_db = db.get_workouts_by_user(session["user_id"])
+        workouts = []
+        if not workouts_from_db:
+            return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts)
+        
+        for workout in workouts_from_db:  
+            workouts.append(Workout(workout[0], workout[1], workout[2], workout[3],workout[4], session["user_id"], session["username"]))
+            
+        db.close()
+        return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts)
+    except Exception as e:
+        return f"error: {e}"
+    
+
 
 @app.route("/new_workout_post", methods=["POST"])
 def new_workout_post():
@@ -79,15 +99,59 @@ def new_workout_post():
     
     content = request.form["content"]
     user_id = session["user_id"]
-    sent_at = datetime.now()
+    sent_at = datetime.now().isoformat(" ")
     title = request.form["title"]
     workout_level = request.form["workout_level"]
     
     try:
         db = Database()
-        db.add_message(content, sent_at, user_id, title, workout_level)
-    
+        db.add_workout(content, sent_at, user_id, title, workout_level)
+        db.close()
         print(f"New workout post by user_id {user_id}: {content} at {sent_at} with title {title}, level {workout_level}")
         return redirect("/")
     except Exception as e:
         return f"error: {e}"
+    
+    
+@app.route("/workouts")
+def workouts():
+    ''' Page showing all workout posts '''
+    if "user_id" not in session:
+        return redirect("/")
+    db = Database()
+    workouts_from_db = db.get_workouts()
+    workouts = []
+    print(workouts_from_db)
+    
+    if not workouts_from_db:
+        db.close()
+        return render_template("workouts.html", workouts=workouts)
+    
+    
+    for workout in workouts_from_db:
+        comments_from_db = db.get_workout_comments(workout[0])  
+        workouts.append(Workout(
+            workout[0],
+            workout[1],
+            workout[2],
+            workout[3],
+            workout[4],
+            workout[5],
+            db.get_username_by_id(workout[5]),
+            comments_from_db
+            ))
+        
+        
+    db.close()
+    return render_template("workouts.html", workouts=workouts)
+
+@app.route("/comment_post/<int:workout_id>", methods=["POST"])
+def comment_post(workout_id):
+    ''' Creates a new comment on a workout post '''
+    if "user_id" not in session:
+        return redirect("/")
+    comment_content = request.form["comment_content"]
+    db = Database()
+    db.add_comment_to_workout(workout_id, session["user_id"], comment_content)
+    db.close()
+    return redirect("/workouts")

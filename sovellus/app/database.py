@@ -17,7 +17,7 @@ class Database:
         ''' Creates necessary tables if they don't exist '''
         
         self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS messages (
+            CREATE TABLE IF NOT EXISTS workouts (
             id INTEGER PRIMARY KEY,
                 content TEXT,
                 title TEXT,
@@ -38,22 +38,49 @@ class Database:
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS comment_threads (
             id INTEGER PRIMARY KEY,
-                title TEXT,
+                comment TEXT,
                 user_id INTEGER REFERENCES users,
-                message_id INTEGER REFERENCES messages
+                workout_id INTEGER REFERENCES workouts
             );
         """)
         self.connection.commit()
-        
-    def add_message(self,content, sent_at, user_id, title, workout_level):
+    
+    
+    def add_comment_to_workout(self, workout_id, user_id, content):
         self.cursor.execute("""
-            INSERT INTO messages (content, sent_at, user_id, title, workout_level)
+            INSERT INTO comment_threads (comment, user_id, workout_id)
+            VALUES (?, ?, ?)
+        """, (content, user_id, workout_id))
+        self.connection.commit()
+        
+    def get_workout_comments(self, workout_id):
+        self.cursor.execute("SELECT comment, user_id FROM comment_threads WHERE workout_id = ?", (workout_id,))       
+        rows = self.cursor.fetchall()
+        comments = []
+        for row in rows:
+            comment = row[0]
+            print("rivi:", row[1])
+            username = self.get_username_by_id(row[1])
+            print("username:", username)
+            comments.append((comment, username))
+        return comments
+            
+            
+        
+    def add_workout(self,content, sent_at, user_id, title, workout_level):
+        self.cursor.execute("""
+            INSERT INTO workouts (content, sent_at, user_id, title, workout_level)
             VALUES (?, ?, ?, ?, ?)
         """, (content, sent_at, user_id, title, workout_level))
         self.connection.commit()
+    
         
-    def get_messages(self):
-        self.cursor.execute("SELECT * FROM messages") # TODO: add WHERE clause for threads ?
+    def get_workouts(self):
+        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, user_id FROM workouts") 
+        return self.cursor.fetchall()
+    
+    def get_workouts_by_user(self, user_id):
+        self.cursor.execute("SELECT id, title, content, sent_at, workout_level FROM workouts WHERE user_id = ?", (user_id,))
         return self.cursor.fetchall()
     
     def add_user(self, username, password_hash):
@@ -66,11 +93,14 @@ class Database:
     def get_user(self, username):
         self.cursor.execute("SELECT username, password_hash FROM users WHERE username = ?", (username,))
         return self.cursor.fetchone()
+    
     #contains user id now
     def get_user_by_id(self, username):
         self.cursor.execute("SELECT id, username, password_hash FROM users WHERE username = ?", (username,))
         return self.cursor.fetchone()
-        
+    def get_username_by_id(self, user_id):
+        self.cursor.execute("SELECT username FROM users WHERE id = ?", (user_id,))
+        return self.cursor.fetchone()
     
     def close(self):
         self.connection.close()
