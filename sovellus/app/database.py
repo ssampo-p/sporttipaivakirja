@@ -74,7 +74,10 @@ class Database:
         """, (content, sent_at, user_id, title, workout_level))
         self.connection.commit()
     
-        
+    def get_workout(self,workout_id):
+        self.cursor.execute("SELECT id, title, content,sent_at, workout_level, user_id FROM workouts WHERE id = ?", (workout_id,))
+        return self.cursor.fetchone()
+    
     def get_workouts(self):
         self.cursor.execute("SELECT id, title, content, sent_at, workout_level, user_id FROM workouts") 
         return self.cursor.fetchall()
@@ -82,6 +85,12 @@ class Database:
     def get_workouts_by_user(self, user_id):
         self.cursor.execute("SELECT id, title, content, sent_at, workout_level FROM workouts WHERE user_id = ?", (user_id,))
         return self.cursor.fetchall()
+    
+    def edit_workout(self, new_content, workout_id, user_id,):
+        self.cursor.execute("UPDATE workouts SET content = ? WHERE id = ? AND user_id = ?", (new_content, workout_id, user_id)) 
+        self.connection.commit()
+        
+
     
     def add_user(self, username, password_hash):
         self.cursor.execute("""

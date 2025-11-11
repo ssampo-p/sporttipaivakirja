@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+
+<html>
+    <body>
+        <h2>Muokkaa suoritusta</h2>
+        <form method="post" action="{{ url_for('update_workout', workout_id=workout.id) }}">
+            <label for="content">Sisältö:</label><br>
+            <textarea name="content" rows="5" cols="50">{{ workout.content }}</textarea><br>
+            <input type="submit" value="Tallenna">
+        </form>
+        <a href="{{ url_for("own_page", user_id=session["user_id"]) }}">Palaa takaisin</a>
+    </body>
+</html>

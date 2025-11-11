@@ -155,3 +155,32 @@ def comment_post(workout_id):
     db.add_comment_to_workout(workout_id, session["user_id"], comment_content)
     db.close()
     return redirect("/workouts")
+
+@app.route("/edit_workout/<int:workout_id>", methods=["POST"])
+def edit_workout(workout_id):
+    db = Database()
+    print("workout_id", workout_id)
+    workout_from_db = db.get_workout(workout_id)
+    #TODO not the best way create workout obj..
+    workout = Workout(workout_from_db[0],
+            workout_from_db[1],
+            workout_from_db[2],
+            workout_from_db[3],
+            workout_from_db[4],
+            workout_from_db[5],
+            db.get_username_by_id(workout_from_db[5]))
+    
+    
+    if request.method == "POST":
+        return render_template("edit_workout.html", workout = workout)
+    db.close()
+ 
+@app.route("/update_workout/<int:workout_id>", methods=["POST"])
+def update_workout(workout_id):
+    db  = Database()
+    new_content = request.form["content"]
+    db.edit_workout(new_content, workout_id, session["user_id"])
+    db.close 
+    
+    return redirect(url_for("own_page", user_id=session["user_id"])) 
+    
