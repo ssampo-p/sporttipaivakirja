@@ -6,6 +6,27 @@
         <form method="post" action="{{ url_for('update_workout', workout_id=workout.id) }}">
             <label for="content">Sisältö:</label><br>
             <textarea name="content" rows="5" cols="50">{{ workout.content }}</textarea><br>
+            <fieldset>
+                <legend>Valitse suorituksen taso:</legend>
+                <div>
+
+                  <input type="radio"  name="workout_level" value="easy" 
+                  {%if workout.workout_level == "easy"%}checked{%endif%}>
+                  <label for="easy">Helppo</label>
+                </div>
+            
+                <div>
+                  <input type="radio"  name="workout_level" value="medium"
+                  {%if workout.workout_level == "medium"%}checked{%endif%}>
+                  <label for="medium">Keskitaso</label>
+                </div>
+            
+                <div>
+                  <input type="radio" name="workout_level" value="hard"
+                  {%if workout.workout_level == "hard"%}checked{%endif%}>
+                  <label for="hard">Kova</label>        
+                </div>
+            </fieldset>
             <input type="submit" value="Tallenna">
         </form>
         <a href="{{ url_for("own_page", user_id=session["user_id"]) }}">Palaa takaisin</a>

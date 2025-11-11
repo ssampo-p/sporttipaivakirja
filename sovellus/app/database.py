@@ -86,8 +86,8 @@ class Database:
         self.cursor.execute("SELECT id, title, content, sent_at, workout_level FROM workouts WHERE user_id = ?", (user_id,))
         return self.cursor.fetchall()
     
-    def edit_workout(self, new_content, workout_id, user_id,):
-        self.cursor.execute("UPDATE workouts SET content = ? WHERE id = ? AND user_id = ?", (new_content, workout_id, user_id)) 
+    def edit_workout(self, new_content, workout_level, workout_id, user_id,):
+        self.cursor.execute("UPDATE workouts SET content = ?, workout_level = ? WHERE id = ? AND user_id = ?", (new_content,workout_level, workout_id, user_id)) 
         self.connection.commit()
         
 

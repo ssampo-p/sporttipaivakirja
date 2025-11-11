@@ -179,7 +179,8 @@ def edit_workout(workout_id):
 def update_workout(workout_id):
     db  = Database()
     new_content = request.form["content"]
-    db.edit_workout(new_content, workout_id, session["user_id"])
+    workout_level = request.form["workout_level"]
+    db.edit_workout(new_content, workout_level, workout_id, session["user_id"])
     db.close 
     
     return redirect(url_for("own_page", user_id=session["user_id"])) 
