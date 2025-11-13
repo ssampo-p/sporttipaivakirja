@@ -75,12 +75,19 @@ class Database:
         self.connection.commit()
     
     def get_workout(self,workout_id):
-        self.cursor.execute("SELECT id, title, content,sent_at, workout_level, user_id FROM workouts WHERE id = ?", (workout_id,))
+        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, user_id FROM workouts WHERE id = ?", (workout_id,))
         return self.cursor.fetchone()
     
     def get_workouts(self):
         self.cursor.execute("SELECT id, title, content, sent_at, workout_level, user_id FROM workouts") 
         return self.cursor.fetchall()
+    def get_workouts_by_level(self, workout_level):
+        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, user_id FROM workouts WHERE workout_level = ?", (workout_level,))
+        return self.cursor.fetchall()
+    
+    def delete_workout(self, workout_id):
+        self.cursor.execute("DELETE FROM workouts WHERE id = ?",(workout_id,))
+        self.connection.commit()
     
     def get_workouts_by_user(self, user_id):
         self.cursor.execute("SELECT id, title, content, sent_at, workout_level FROM workouts WHERE user_id = ?", (user_id,))

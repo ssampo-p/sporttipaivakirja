@@ -3,7 +3,7 @@
 <html>
     <body>
         <h2>Muokkaa suoritusta</h2>
-        <form method="post" action="{{ url_for('update_workout', workout_id=workout.id) }}">
+        <form method="post" action="{{url_for("edit_workout", workout_id = workout.id, workout_user_id = workout.user_id)}}">
             <label for="content">Sisältö:</label><br>
             <textarea name="content" rows="5" cols="50">{{ workout.content }}</textarea><br>
             <fieldset>

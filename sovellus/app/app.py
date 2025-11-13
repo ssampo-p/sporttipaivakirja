@@ -1,6 +1,6 @@
 import sqlite3
 from flask import Flask
-from flask import redirect, render_template, request, session, url_for
+from flask import redirect, render_template, request, session, url_for, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.database import Database
 from . import config
@@ -70,8 +70,8 @@ def create():
 @app.route("/user_page/<int:user_id>")
 def own_page(user_id):
     ''' User's own page , can be accessed only when logged in '''
-    if "username" not in session:
-        return redirect("/")
+    if user_id != session["user_id"]:
+        return abort(403)
     user_id = session["username"]
     username = session["username"]
     try:
@@ -116,8 +116,8 @@ def new_workout_post():
 @app.route("/workouts")
 def workouts():
     ''' Page showing all workout posts '''
-    if "user_id" not in session:
-        return redirect("/")
+    # if "user_id" not in session:
+    #     return redirect("/")
     db = Database()
     workouts_from_db = db.get_workouts()
     workouts = []
@@ -156,8 +156,15 @@ def comment_post(workout_id):
     db.close()
     return redirect("/workouts")
 
-@app.route("/edit_workout/<int:workout_id>", methods=["POST"])
-def edit_workout(workout_id):
+@app.route("/edit_workout/<int:workout_id>/<int:workout_user_id>", methods=["POST", "GET"])
+def edit_workout(workout_id, workout_user_id):
+    
+    
+    if workout_user_id != session["user_id"]:
+        abort(403)
+        
+    
+    print(workout_user_id)
     db = Database()
     print("workout_id", workout_id)
     workout_from_db = db.get_workout(workout_id)
@@ -169,19 +176,60 @@ def edit_workout(workout_id):
             workout_from_db[4],
             workout_from_db[5],
             db.get_username_by_id(workout_from_db[5]))
-    
+    db.close()
     
     if request.method == "POST":
         return render_template("edit_workout.html", workout = workout)
-    db.close()
+    if request.method == "GET":
+        return render_template("edit_workout.html",workout = workout)
+   
  
 @app.route("/update_workout/<int:workout_id>", methods=["POST"])
 def update_workout(workout_id):
     db  = Database()
+    workout = db.get_workout(workout_id)
+    if not workout or workout["user_id"] != session["user_id"]:
+        db.close()
+        abort(403)
     new_content = request.form["content"]
     workout_level = request.form["workout_level"]
     db.edit_workout(new_content, workout_level, workout_id, session["user_id"])
     db.close 
     
     return redirect(url_for("own_page", user_id=session["user_id"])) 
+    
+@app.route("/workouts/sort_workouts", methods=["POST"])
+def sort_workouts():
+    workout_level = request.form["workout_level"]
+    if workout_level == "all":
+        return redirect(url_for("workouts",))
+    db = Database()
+    workouts_from_db = db.get_workouts_by_level(workout_level)
+    workouts = []
+    for workout in workouts_from_db:
+        comments_from_db = db.get_workout_comments(workout[0]) 
+        workouts.append(Workout(workout[0],
+                                workout[1],
+                                workout[2],
+                                workout[3],
+                                workout[4],
+                                workout[5],
+                                db.get_username_by_id(workout[5]),
+                                comments_from_db,
+                                ))
+    db.close()
+        
+    return render_template("workouts.html",workouts=workouts)
+
+
+@app.route("/delete_workout/<int:workout_id>/<int:workout_user_id>",methods=["POST"])
+def delete_workout(workout_id, workout_user_id):
+    if workout_user_id != session["user_id"]:
+        abort(403)
+        
+    db = Database()
+    db.delete_workout(workout_id)
+    db.close()
+    return redirect(url_for("own_page", user_id=session["user_id"]))
+    
     
