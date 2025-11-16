@@ -3,7 +3,13 @@
   <head>
     <title>Rekisteröinti</title>
   </head>
-
+  {% with messages=get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
   <body>
     <form action="/register" method="post">
       <p>

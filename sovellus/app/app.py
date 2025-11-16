@@ -32,9 +32,11 @@ def login():
             return redirect("/")
             
         else:
-            return "Virheellinen käyttäjätunnus tai salasana"
-    except Exception as e:
+            return "Virheellinen käyttäjätunnus tai salasana" #TODO fix, so that in case of an error, you are not taken to a different page
+    except sqlite3.IntegrityError as e:
         return f"Tapahtui virhe: {e}"
+    finally:
+        redirect("/")
     
 
 @app.route("/logout")
@@ -69,6 +71,9 @@ def register():
             flash("VIRHE: Valitsemasi tunnus on jo varattu")
             filled = {"username": username}
             return render_template("register.html", filled=filled)
+        finally:
+            if db:
+                db.close()
 
         flash("Tunnuksen luominen onnistui, voit nyt kirjautua sisään")
         return redirect("/")
@@ -93,8 +98,13 @@ def own_page(user_id):
             
         db.close()
         return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts)
-    except Exception as e:
-        return f"error: {e}"
+    except sqlite3.IntegrityError as e:
+        flash("Tapahtui virhe oman sivun lataamisessa!")
+    finally:
+        db.close()
+        return redirect("/")
+        
+        
     
 
 
