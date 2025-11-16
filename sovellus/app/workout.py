@@ -1,10 +1,11 @@
 class Workout:
-    def __init__(self,id , title, content, sent_at, workout_level, user_id= None, username =None, comments=None):
+    def __init__(self, id, title, content, sent_at, workout_level, sport, user_id= None, username =None, comments=None,):
         self.id = id
         self.title = title
         self.content = content
         self.sent_at = sent_at
         self.workout_level = workout_level
+        self.sport = sport
         self.user_id = user_id
         self.username = username
         self.comments = comments or []

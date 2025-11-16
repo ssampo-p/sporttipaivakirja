@@ -1,41 +1,32 @@
 <!DOCTYPE html>
 <html>
-    {%include "_header.html"%}
-    <body>
-
-        {% if username %}
-            <h1>Tervetuloa, {{ username }}!</h1>
-            <p>Viimeisimmät urheilusuorituksesi:</p>
-            <fieldset>
-                <legend>Omat urheilusuoritukset</legend>
-            {%if workouts %}
-                {% for workout in workouts %}
-                    <div>
-                        <h3>{{ workout.title }} (Taso: {{ workout.workout_level }})</h3>
-                        <p>{{ workout.content }}</p>
-                        <small>Lisätty: {{ workout.sent_at }}</small>
-                        <form method="post" action= "{{url_for("edit_workout", workout_id = workout.id, workout_user_id = workout.user_id)}}">
-                            <button type="submit">
-                                Muokkaa
-                            </button>
-                        </form>
-                        <form method="post" action= "{{url_for("delete_workout", workout_id = workout.id, workout_user_id = workout.user_id)}}">
-                            <button type="submit">
-                                Poista
-                            </button>
-                        </form>
-                                
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>Sinulla ei ole vielä urheilusuorituksia.</p>
-            {% endif %}
-            </fieldset>
-
+  {% include '_header.html' %}
+  <body>
+    {% if username %}
+      <h1>Tervetuloa, {{ username }}!</h1>
+      <p>Viimeisimmät urheilusuorituksesi:</p>
+      <fieldset>
+        <legend>Omat urheilusuoritukset</legend>
+        {% if workouts %}
+          {% for workout in workouts %}
+            <div>
+              <h3>{{ workout.title }}, Taso: {{ workout.workout_level }}, Laji {{ workout.sport }}</h3>
+              <p>{{ workout.content }}</p>
+              <small>Lisätty: {{ workout.sent_at }}</small>
+              <form method="post" action="{{ url_for('edit_workout', workout_id=workout.id, workout_user_id=workout.user_id) }}">
+                <button type="submit">Muokkaa</button>
+              </form>
+              <form method="post" action="{{ url_for('delete_workout', workout_id=workout.id, workout_user_id=workout.user_id) }}">
+                <button type="submit">Poista</button>
+              </form>
+            </div>
+          {% endfor %}
         {% else %}
-            <h1>Sinun pitää kirjautua sisään nähdäksesi tämän sivun.</h1> <!--this should not be seen -->
+          <p>Sinulla ei ole vielä urheilusuorituksia.</p>
         {% endif %}
-
-    </body>
+      </fieldset>
+    {% else %}
+      <h1>Sinun pitää kirjautua sisään nähdäksesi tämän sivun.</h1> <!-- this should not be seen -->
+    {% endif %}
+  </body>
 </html>
-  

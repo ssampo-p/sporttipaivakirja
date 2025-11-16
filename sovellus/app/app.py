@@ -1,6 +1,6 @@
 import sqlite3
 from flask import Flask
-from flask import redirect, render_template, request, session, url_for, abort
+from flask import redirect, render_template, request, session, url_for, abort, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.database import Database
 from . import config
@@ -44,28 +44,58 @@ def logout():
     return redirect("/")
 
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
-    return render_template("register.html")
+    if request.method == "GET":
+        return render_template("register.html", filled={})
+
+    if request.method == "POST":
+        username = request.form["username"]
+        if len(username) > 16:
+            abort(403)
+        password1 = request.form["password1"]
+        password2 = request.form["password2"]
+
+        if password1 != password2:
+            flash("VIRHE: Antamasi salasanat eivät ole samat")
+            filled = {"username": username}
+            return render_template("register.html", filled=filled)
+        password_hash = generate_password_hash(password1)
+        try:
+            db = Database()
+            db.add_user(username, password_hash)
+            db.close()
+        except sqlite3.IntegrityError:
+            flash("VIRHE: Valitsemasi tunnus on jo varattu")
+            filled = {"username": username}
+            return render_template("register.html", filled=filled)
+
+        flash("Tunnuksen luominen onnistui, voit nyt kirjautua sisään")
+        return redirect("/")
+    
+
+# @app.route("/register")
+# def register():
+#     return render_template("register.html")
 
 
-@app.route("/create", methods=["POST"])
-def create():
-    username = request.form["username"]
-    password1 = request.form["password1"]
-    password2 = request.form["password2"]
-    if password1 != password2:
-        return "VIRHE: salasanat eivät ole samat"
-    password_hash = generate_password_hash(password1)
+# @app.route("/create", methods=["POST"])
+# def create():
+#     username = request.form["username"]
+#     password1 = request.form["password1"]
+#     password2 = request.form["password2"]
+#     if password1 != password2:
+#         return "VIRHE: salasanat eivät ole samat"
+#     password_hash = generate_password_hash(password1)
 
-    try:
-        db = Database()
-        db.add_user(username, password_hash)
-        db.close()
-    except sqlite3.IntegrityError:
-        return "VIRHE: tunnus on jo varattu"
+#     try:
+#         db = Database()
+#         db.add_user(username, password_hash)
+#         db.close()
+#     except sqlite3.IntegrityError:
+#         return "VIRHE: tunnus on jo varattu"
 
-    return "Tunnus luotu"
+#     return "Tunnus luotu"
 
 @app.route("/user_page/<int:user_id>")
 def own_page(user_id):
@@ -82,7 +112,7 @@ def own_page(user_id):
             return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts)
         
         for workout in workouts_from_db:  
-            workouts.append(Workout(workout[0], workout[1], workout[2], workout[3],workout[4], session["user_id"], session["username"]))
+            workouts.append(Workout(workout[0], workout[1], workout[2], workout[3],workout[4], workout[5], session["user_id"], session["username"]))
             
         db.close()
         return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts)
@@ -102,10 +132,11 @@ def new_workout_post():
     sent_at = datetime.now().isoformat(" ")
     title = request.form["title"]
     workout_level = request.form["workout_level"]
+    sport = request.form["workout_type"]
     
     try:
         db = Database()
-        db.add_workout(content, sent_at, user_id, title, workout_level)
+        db.add_workout(content, sent_at, user_id, title, workout_level, sport)
         db.close()
         print(f"New workout post by user_id {user_id}: {content} at {sent_at} with title {title}, level {workout_level}")
         return redirect("/")
@@ -116,8 +147,6 @@ def new_workout_post():
 @app.route("/workouts")
 def workouts():
     ''' Page showing all workout posts '''
-    # if "user_id" not in session:
-    #     return redirect("/")
     db = Database()
     workouts_from_db = db.get_workouts()
     workouts = []
@@ -127,19 +156,19 @@ def workouts():
         db.close()
         return render_template("workouts.html", workouts=workouts)
     
-    
-    for workout in workouts_from_db:
-        comments_from_db = db.get_workout_comments(workout[0])  
-        workouts.append(Workout(
-            workout[0],
-            workout[1],
-            workout[2],
-            workout[3],
-            workout[4],
-            workout[5],
-            db.get_username_by_id(workout[5]),
-            comments_from_db
-            ))
+    create_workouts(db,workouts_from_db, workouts)
+    # for workout in workouts_from_db:
+    #     comments_from_db = db.get_workout_comments(workout[0])  
+    #     workouts.append(Workout(
+    #         workout[0],
+    #         workout[1],
+    #         workout[2],
+    #         workout[3],
+    #         workout[4],
+    #         workout[5],
+    #         db.get_username_by_id(workout[5]),
+    #         comments_from_db
+    #         ))
         
         
     db.close()
@@ -158,8 +187,6 @@ def comment_post(workout_id):
 
 @app.route("/edit_workout/<int:workout_id>/<int:workout_user_id>", methods=["POST", "GET"])
 def edit_workout(workout_id, workout_user_id):
-    
-    
     if workout_user_id != session["user_id"]:
         abort(403)
         
@@ -175,7 +202,8 @@ def edit_workout(workout_id, workout_user_id):
             workout_from_db[3],
             workout_from_db[4],
             workout_from_db[5],
-            db.get_username_by_id(workout_from_db[5]))
+            workout_from_db[6],
+            db.get_username_by_id(workout_from_db[6]))
     db.close()
     
     if request.method == "POST":
@@ -184,16 +212,21 @@ def edit_workout(workout_id, workout_user_id):
         return render_template("edit_workout.html",workout = workout)
    
  
-@app.route("/update_workout/<int:workout_id>", methods=["POST"])
-def update_workout(workout_id):
+@app.route("/update_workout/<int:workout_id>/<int:workout_user_id>", methods=["POST"])
+def update_workout(workout_id, workout_user_id):
+    
     db  = Database()
     workout = db.get_workout(workout_id)
-    if not workout or workout["user_id"] != session["user_id"]:
+    if not workout or workout_user_id != session["user_id"]:
         db.close()
         abort(403)
+    title = request.form["title"]
     new_content = request.form["content"]
     workout_level = request.form["workout_level"]
-    db.edit_workout(new_content, workout_level, workout_id, session["user_id"])
+    sport = request.form["workout_type"]
+    print("sport: ", sport)
+    
+    db.edit_workout(title, new_content, workout_level,sport, workout_id, session["user_id"])
     db.close 
     
     return redirect(url_for("own_page", user_id=session["user_id"])) 
@@ -206,6 +239,12 @@ def sort_workouts():
     db = Database()
     workouts_from_db = db.get_workouts_by_level(workout_level)
     workouts = []
+    create_workouts(db, workouts_from_db, workouts)
+    db.close()
+        
+    return render_template("workouts.html",workouts=workouts)
+
+def create_workouts(db, workouts_from_db, workouts):
     for workout in workouts_from_db:
         comments_from_db = db.get_workout_comments(workout[0]) 
         workouts.append(Workout(workout[0],
@@ -214,12 +253,10 @@ def sort_workouts():
                                 workout[3],
                                 workout[4],
                                 workout[5],
-                                db.get_username_by_id(workout[5]),
+                                workout[6],
+                                db.get_username_by_id(workout[6]),
                                 comments_from_db,
                                 ))
-    db.close()
-        
-    return render_template("workouts.html",workouts=workouts)
 
 
 @app.route("/delete_workout/<int:workout_id>/<int:workout_user_id>",methods=["POST"])

@@ -4,19 +4,18 @@
 <body>
     <h1> Voit sovelluksessa luoda merkintöjä urheilusuorituksista ja  tarkastella + kommentoida muiden suorituksia  </h1>
     <h2> Aloita luomalla tunnus tai kirjautumalla sisään! </h2>
-    {% if session.username %}
-  <p>
-    Olet kirjautunut nimellä {{ session.username }}
-  </p>
-  <p>
-    <a href="/logout">Kirjaudu ulos</a>
-    <p><a href="{{ url_for("own_page", user_id=session["user_id"]) }}">Omat sivut</a></p>
-  </p>
   {% if session.username %}
-  <h2>Luo uusi urheilusuoritus</h2>
-  <form action="/new_workout_post" method="post">
-     <fieldset>
-        <legend> Uusi Urheilusuoritus</legend>
+    <p>
+      Olet kirjautunut nimellä {{ session.username }}
+    </p>
+    <p>
+      <a href="/logout">Kirjaudu ulos</a>
+    </p>
+
+    <h2>Luo uusi urheilusuoritus</h2>
+    <form action="/new_workout_post" method="post">
+       <fieldset>
+          <legend> Uusi Urheilusuoritus</legend>
           <p>
             Otsikko: <br />
             <input type="text" name="title" />
@@ -43,10 +42,22 @@
               <label for="hard">Kova</label>        
             </div>
           </fieldset>
+           <label for="workout_type">Valitse laji:</label>
+            <select name="workout_type" id="workout_type">
+                <option value="icehockey">Jääkiekko</option>
+                <option value="footbal">Jalkapallo</option>
+                <option value="running">Juoksu</option>
+                <option value="gym">Kuntosali</option>
+                <option value="biking">Pyöräily</option>
+                <option value="tennis">Tennis</option>
+                <option value="padel">Padel</option>
+                <option value="volleyball">Lentopallo</option>
+                <option value="combat_sport">Kamppailu</option>
+                <option value="other">Muu</option>
+            </select>
           <input type="submit" value="Lähetä" />  
-    </fieldset>
- </form>
-  {% endif %}
+        </fieldset>
+      </form>
   {% else %}
   <h1>Kirjaudu tai rekisteröidy jatkaaksesi</h1>
     <p><a href="/register">Rekisteröidy</a></p>

@@ -23,6 +23,7 @@ class Database:
                 title TEXT,
                 sent_at TEXT,
                 workout_level TEXT,
+                sport TEXT,
                 user_id INTEGER REFERENCES users
            );
         """)
@@ -67,22 +68,22 @@ class Database:
             
             
         
-    def add_workout(self,content, sent_at, user_id, title, workout_level):
+    def add_workout(self,content, sent_at, user_id, title, workout_level, sport):
         self.cursor.execute("""
-            INSERT INTO workouts (content, sent_at, user_id, title, workout_level)
-            VALUES (?, ?, ?, ?, ?)
-        """, (content, sent_at, user_id, title, workout_level))
+            INSERT INTO workouts (content, sent_at, user_id, title, workout_level, sport)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (content, sent_at, user_id, title, workout_level, sport))
         self.connection.commit()
     
     def get_workout(self,workout_id):
-        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, user_id FROM workouts WHERE id = ?", (workout_id,))
+        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts WHERE id = ?", (workout_id,))
         return self.cursor.fetchone()
     
     def get_workouts(self):
-        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, user_id FROM workouts") 
+        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts") 
         return self.cursor.fetchall()
     def get_workouts_by_level(self, workout_level):
-        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, user_id FROM workouts WHERE workout_level = ?", (workout_level,))
+        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts WHERE workout_level = ?", (workout_level,))
         return self.cursor.fetchall()
     
     def delete_workout(self, workout_id):
@@ -90,11 +91,11 @@ class Database:
         self.connection.commit()
     
     def get_workouts_by_user(self, user_id):
-        self.cursor.execute("SELECT id, title, content, sent_at, workout_level FROM workouts WHERE user_id = ?", (user_id,))
+        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport FROM workouts WHERE user_id = ?", (user_id,))
         return self.cursor.fetchall()
     
-    def edit_workout(self, new_content, workout_level, workout_id, user_id,):
-        self.cursor.execute("UPDATE workouts SET content = ?, workout_level = ? WHERE id = ? AND user_id = ?", (new_content,workout_level, workout_id, user_id)) 
+    def edit_workout(self,new_title, new_content, workout_level, sport, workout_id, user_id,):
+        self.cursor.execute("UPDATE workouts SET title = ?, content = ?, workout_level = ?, sport = ? WHERE id = ? AND user_id = ?", (new_title, new_content, workout_level, sport, workout_id, user_id)) 
         self.connection.commit()
         
 

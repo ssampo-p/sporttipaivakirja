@@ -3,15 +3,18 @@
 <html>
     <body>
         <h2>Muokkaa suoritusta</h2>
-        <form method="post" action="{{url_for("edit_workout", workout_id = workout.id, workout_user_id = workout.user_id)}}">
-            <label for="content">Sisältö:</label><br>
+        <form method="post" action="{{ url_for("update_workout", workout_id=workout.id, workout_user_id = workout.user_id) }}">
+            <label for="title">Sisältö:</label><br>
+            <textarea name="title" rows="1" cols="30">{{workout.title}}</textarea><br>
+            
+            <label for="content">Sisältö:</label><br> 
             <textarea name="content" rows="5" cols="50">{{ workout.content }}</textarea><br>
             <fieldset>
                 <legend>Valitse suorituksen taso:</legend>
                 <div>
 
                   <input type="radio"  name="workout_level" value="easy" 
-                  {%if workout.workout_level == "easy"%}checked{%endif%}>
+                  {%if workout.workout_level == "easy"%} checked {%endif%}>
                   <label for="easy">Helppo</label>
                 </div>
             
@@ -26,7 +29,30 @@
                   {%if workout.workout_level == "hard"%}checked{%endif%}>
                   <label for="hard">Kova</label>        
                 </div>
+                {%set workout_types={
+                        "icehockey": "Jääkiekko",
+                        "football" :"Jalkapallo",
+                        "running":"Juoksu",
+                        "gym":"Kuntosali",
+                        "biking": "Pyöräily",
+                        "tennis": "Tennis",
+                        "padel": "Padel",
+                        "volleyball": "Lentopallo",
+                        "combat_sport": "Kamppailu",
+                        "other": "Muu"
+                    }%}
+
+                <label for="workout_type">Valitse laji:</label>
+                <select name="workout_type" id="workout_type">
+                    {% for key, label in workout_types.items() %}
+                        <option value="{{ key }}"
+                            {% if workout.sport == key %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
             </fieldset>
+
             <input type="submit" value="Tallenna">
         </form>
         <a href="{{ url_for("own_page", user_id=session["user_id"]) }}">Palaa takaisin</a>
