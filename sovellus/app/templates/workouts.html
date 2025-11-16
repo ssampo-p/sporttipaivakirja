@@ -39,9 +39,9 @@
             {%if session.user_id%}
                 <div>
                     <form method="post" action="{{ url_for("comment_post", workout_id=workout.id) }}">
-                    <textarea name="comment_content" rows="4" cols="50"></textarea><br>
-                    <input type="submit" value="Lähetä kommentti">
-                </form>
+                        <textarea name="comment_content" rows="4" cols="50"></textarea><br>
+                        <input type="submit" value="Lähetä kommentti">
+                    </form>
                     {%if session.user_id == workout.user_id%}
                     <form method="post" action= "{{url_for("edit_workout", workout_id = workout.id, workout_user_id = workout.user_id   )}}">
                         <button type="submit"> Muokkaa</button>
@@ -61,9 +61,9 @@
         </fieldset>
     {% endfor %}
 
-    <p>Kirjaudu tai rekisteröidy kommentoidaksesi suorituksia</h1>
+    <p>Kirjaudu tai rekisteröidy kommentoidaksesi suorituksia</p>
     <p><a href="/register">Rekisteröidy</a></p>
-    <p><a href "/">Kirjaudu etusivulta </a></p>
+    <p><a href="/">Kirjaudu etusivulta </a></p>
 </body>
 </html>
 
