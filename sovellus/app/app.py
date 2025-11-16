@@ -101,8 +101,9 @@ def own_page(user_id):
     except sqlite3.IntegrityError as e:
         flash("Tapahtui virhe oman sivun lataamisessa!")
     finally:
-        db.close()
-        return redirect("/")
+        if db:
+            db.close()
+    
         
         
     
