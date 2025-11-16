@@ -9,6 +9,16 @@
 
 ## Sovelluksen asennus 
 
+Kloonaa Git-repositorio
+
+```
+git clone https://github.com/ssampo-p/sporttipaivakirja.git
+cd sporttipaivakirja
+```
+
+
+
+
 Asenna `flask`-kirjasto:
 
 ```
