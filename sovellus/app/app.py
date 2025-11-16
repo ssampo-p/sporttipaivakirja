@@ -74,29 +74,6 @@ def register():
         return redirect("/")
     
 
-# @app.route("/register")
-# def register():
-#     return render_template("register.html")
-
-
-# @app.route("/create", methods=["POST"])
-# def create():
-#     username = request.form["username"]
-#     password1 = request.form["password1"]
-#     password2 = request.form["password2"]
-#     if password1 != password2:
-#         return "VIRHE: salasanat eivät ole samat"
-#     password_hash = generate_password_hash(password1)
-
-#     try:
-#         db = Database()
-#         db.add_user(username, password_hash)
-#         db.close()
-#     except sqlite3.IntegrityError:
-#         return "VIRHE: tunnus on jo varattu"
-
-#     return "Tunnus luotu"
-
 @app.route("/user_page/<int:user_id>")
 def own_page(user_id):
     ''' User's own page , can be accessed only when logged in '''
