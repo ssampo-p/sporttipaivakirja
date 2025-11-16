@@ -82,9 +82,30 @@ class Database:
     def get_workouts(self):
         self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts") 
         return self.cursor.fetchall()
+    
     def get_workouts_by_level(self, workout_level):
         self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts WHERE workout_level = ?", (workout_level,))
         return self.cursor.fetchall()
+    
+    def get_sorted_workouts(self, workout_level, sport):
+        query = "SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts"
+        conditions = []
+        params = []
+        if workout_level != "all":
+            conditions.append("workout_level = ?")
+            params.append(workout_level)
+
+        if sport != "all":
+            conditions.append("sport = ?")
+            params.append(sport)
+            
+        query += " WHERE " + " AND ".join(conditions)
+        
+        print(query)
+        
+        self.cursor.execute(query, params)
+        return self.cursor.fetchall()
+            
     
     def delete_workout(self, workout_id):
         self.cursor.execute("DELETE FROM workouts WHERE id = ?",(workout_id,))

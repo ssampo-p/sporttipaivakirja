@@ -109,16 +109,18 @@ def new_workout_post():
     sent_at = datetime.now().isoformat(" ")
     title = request.form["title"]
     workout_level = request.form["workout_level"]
-    sport = request.form["workout_type"]
-    
+    sport = request.form["workout_type"]  
     try:
         db = Database()
         db.add_workout(content, sent_at, user_id, title, workout_level, sport)
         db.close()
         print(f"New workout post by user_id {user_id}: {content} at {sent_at} with title {title}, level {workout_level}")
         return redirect("/")
-    except Exception as e:
-        return f"error: {e}"
+    except sqlite3.IntegrityError as e:
+        flash("VIRHE: suoritusta ei voitu tallentaa")
+        return redirect("/")
+    finally:
+        db.close
     
     
 @app.route("/workouts")
@@ -131,23 +133,8 @@ def workouts():
     
     if not workouts_from_db:
         db.close()
-        return render_template("workouts.html", workouts=workouts)
-    
-    create_workouts(db,workouts_from_db, workouts)
-    # for workout in workouts_from_db:
-    #     comments_from_db = db.get_workout_comments(workout[0])  
-    #     workouts.append(Workout(
-    #         workout[0],
-    #         workout[1],
-    #         workout[2],
-    #         workout[3],
-    #         workout[4],
-    #         workout[5],
-    #         db.get_username_by_id(workout[5]),
-    #         comments_from_db
-    #         ))
-        
-        
+        return render_template("workouts.html", workouts=workouts)  
+    create_workouts(db,workouts_from_db, workouts)        
     db.close()
     return render_template("workouts.html", workouts=workouts)
 
@@ -166,8 +153,6 @@ def comment_post(workout_id):
 def edit_workout(workout_id, workout_user_id):
     if workout_user_id != session["user_id"]:
         abort(403)
-        
-    
     print(workout_user_id)
     db = Database()
     print("workout_id", workout_id)
@@ -211,10 +196,12 @@ def update_workout(workout_id, workout_user_id):
 @app.route("/workouts/sort_workouts", methods=["POST"])
 def sort_workouts():
     workout_level = request.form["workout_level"]
-    if workout_level == "all":
+    sport = request.form["workout_type"]
+    if workout_level == "all" and sport == "all":
         return redirect(url_for("workouts",))
     db = Database()
-    workouts_from_db = db.get_workouts_by_level(workout_level)
+    # workouts_from_db = db.get_workouts_by_level(workout_level)
+    workouts_from_db = db.get_sorted_workouts(workout_level,sport)
     workouts = []
     create_workouts(db, workouts_from_db, workouts)
     db.close()
