@@ -12,8 +12,8 @@
 Kloonaa Git-repositorio
 
 ```
-git clone https://github.com/ssampo-p/sporttipaivakirja.git
-cd sporttipaivakirja
+$ git clone https://github.com/ssampo-p/sporttipaivakirja.git
+$ cd sporttipaivakirja
 ```
 
 
