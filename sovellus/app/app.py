@@ -2,10 +2,10 @@ import sqlite3
 from flask import Flask
 from flask import redirect, render_template, request, session, url_for, abort, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.database import Database
-from . import config
+from database import Database
+import config
 from datetime import datetime
-from app.workout import Workout
+from workout import Workout
 
 
 
@@ -211,7 +211,6 @@ def sort_workouts():
     if workout_level == "all" and sport == "all":
         return redirect(url_for("workouts",))
     db = Database()
-    # workouts_from_db = db.get_workouts_by_level(workout_level)
     workouts_from_db = db.get_sorted_workouts(workout_level,sport)
     workouts = []
     create_workouts(db, workouts_from_db, workouts)
