@@ -142,7 +142,6 @@ def new_workout_post():
         db = Database()
         db.add_workout(content, sent_at, user_id, title, workout_level, sport)
         db.close()
-        print(f"New workout post by user_id {user_id}: {content} at {sent_at} with title {title}, level {workout_level}")
         return redirect("/")
     except sqlite3.IntegrityError as e:
         flash("VIRHE: suoritusta ei voitu tallentaa")
@@ -157,8 +156,6 @@ def workouts():
     db = Database()
     workouts_from_db = db.get_workouts()
     workouts = []
-    print(workouts_from_db)
-    
     if not workouts_from_db:
         db.close()
         return render_template("workouts.html", workouts=workouts)  
@@ -184,9 +181,7 @@ def comment_post(workout_id):
 def edit_workout(workout_id, workout_user_id):
     if workout_user_id != session["user_id"]:
         abort(403)
-    print(workout_user_id)
     db = Database()
-    print("workout_id", workout_id)
     workout_from_db = db.get_workout(workout_id)
     #TODO not the best way create workout obj..
     workout = Workout(workout_from_db[0],
