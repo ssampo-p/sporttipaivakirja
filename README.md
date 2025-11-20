@@ -13,7 +13,7 @@ Kloonaa Git-repositorio
 
 ```
 $ git clone https://github.com/ssampo-p/sporttipaivakirja.git
-$ cd sporttipaivakirja
+$ cd sporttipaivakirja/sovellus/app
 ```
 
 Asenna `flask`-kirjasto:
