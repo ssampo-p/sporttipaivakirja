@@ -3,6 +3,7 @@
 <html>
     <body>
         <h2>Muokkaa suoritusta</h2>
+        {%include "flash_msg.html"%}
         <form method="post" action="{{ url_for("update_workout", workout_id=workout.id, workout_user_id = workout.user_id) }}">
             <label for="title">Sisältö:</label><br>
             <textarea name="title" rows="1" cols="30">{{workout.title}}</textarea><br>
@@ -13,33 +14,33 @@
                 <legend>Valitse suorituksen taso:</legend>
                 <div>
 
-                  <input type="radio"  name="workout_level" value="easy" 
-                  {%if workout.workout_level == "easy"%} checked {%endif%}>
-                  <label for="easy">Helppo</label>
+                  <input type="radio"  name="workout_level" value="helppo" 
+                  {%if workout.workout_level == "helppo"%} checked {%endif%}>
+                  <label for="helppo">Helppo</label>
                 </div>
             
                 <div>
-                  <input type="radio"  name="workout_level" value="medium"
-                  {%if workout.workout_level == "medium"%}checked{%endif%}>
-                  <label for="medium">Keskitaso</label>
+                  <input type="radio"  name="workout_level" value="keskitaso"
+                  {%if workout.workout_level == "keskitaso"%}checked{%endif%}>
+                  <label for="keskitaso">Keskitaso</label>
                 </div>
             
                 <div>
-                  <input type="radio" name="workout_level" value="hard"
-                  {%if workout.workout_level == "hard"%}checked{%endif%}>
-                  <label for="hard">Kova</label>        
+                  <input type="radio" name="workout_level" value="kova"
+                  {%if workout.workout_level == "kova"%}checked{%endif%}>
+                  <label for="kova">Kova</label>        
                 </div>
                 {%set workout_types={
-                        "icehockey": "Jääkiekko",
-                        "football" :"Jalkapallo",
-                        "running":"Juoksu",
-                        "gym":"Kuntosali",
-                        "biking": "Pyöräily",
+                        "jääkiekko": "Jääkiekko",
+                        "jalkapallo" :"Jalkapallo",
+                        "juokus":"Juoksu",
+                        "kuntosali":"Kuntosali",
+                        "pyöräily": "Pyöräily",
                         "tennis": "Tennis",
                         "padel": "Padel",
-                        "volleyball": "Lentopallo",
-                        "combat_sport": "Kamppailu",
-                        "other": "Muu"
+                        "lentopallo": "Lentopallo",
+                        "kamppailu": "Kamppailu",
+                        "muu": "Muu"
                     }%}
 
                 <label for="workout_type">Valitse laji:</label>

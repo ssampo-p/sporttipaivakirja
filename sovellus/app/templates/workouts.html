@@ -9,47 +9,58 @@
         <label for="workout_level">Lajittele vaativuuden mukaan:</label>
         <select name="workout_level" id="workout_level">
             <option value="all">Kaikki</option>
-            <option value="easy">Helppo</option>
-            <option value="medium">Keskitaso</option>
-            <option value="hard">Vaikea</option>
+            <option value="helppo">Helppo</option>
+            <option value="keskitaso">Keskitaso</option>
+            <option value="kova">Vaikea</option>
         </select>
         <label for="workout_type">Lajittele urheilulajin mukaan:</label>
         <select name="workout_type" id="workout_type">
             <option value="all">Kaikki</option>
-            <option value="icehockey">Jääkiekko</option>
-            <option value="football">Jalkapallo</option>
-            <option value="running">Juoksu</option>
-            <option value="gym">Kuntosali</option>
-            <option value="biking">Pyöräily</option>
+            <option value="jääkiekko">Jääkiekko</option>
+            <option value="jalkapallo">Jalkapallo</option>
+            <option value="juoksu">Juoksu</option>
+            <option value="kuntosali">Kuntosali</option>
+            <option value="pyöräily">Pyöräily</option>
             <option value="tennis">Tennis</option>
             <option value="padel">Padel</option>
-            <option value="volleyball">Lentopallo</option>
-            <option value="combat_sport">Kamppailu</option>
-            <option value="other">Muu</option>
+            <option value="lentopallo">Lentopallo</option>
+            <option value="kamppailu">Kamppailu</option>
+            <option value="muu">Muu</option>
         </select>
         <button type="submit"> Lajittele </button>
     </form>
+    <br>
+    <form method="post" action="{{url_for("sort_with_query")}}">
+       <label for="sort_query">Lajittele hakusanan mukaan:</label>
+        <input type="text" name="sort_query" value="{{query}}" />
+        <button type="submit"> Lajittele hakusanalla </button>    
+    </form>
+    <br>
     {% for workout in workouts %}
         <fieldset>
             <legend>{{workout.sport}}</legend>
             <div>
-                <h3>{{ workout.title }}, Taso: {{ workout.workout_level }}, Laji {{workout.sport}}</h3>
+                <fieldset>
+                <h3>Otsikko: {{ workout.title }}, Taso: {{ workout.workout_level }}, Laji: {{workout.sport}}</h3>
                 <p>{{ workout.content }}</p>
-                <small>Lisätty: {{ workout.sent_at }} Käyttäjältä {{ workout.username }}</small>
+                <small>Lisätty: {{ workout.sent_at }}, Käyttäjältä {{ workout.username }}</small>
+                </fieldset>
+                <br>
             {%if session.user_id%}
                 <div>
+                    {%include "flash_msg.html"%}
                     <form method="post" action="{{ url_for("comment_post", workout_id=workout.id) }}">
-                        <textarea name="comment_content" rows="4" cols="50"></textarea><br>
+                        <textarea name="comment_content" rows="3" cols="40" maxlength="500"></textarea><br>
                         <input type="submit" value="Lähetä kommentti">
                     </form>
-                    {%if session.user_id == workout.user_id%}
+                   <!-- {%if session.user_id == workout.user_id%}
                     <form method="post" action= "{{url_for("edit_workout", workout_id = workout.id, workout_user_id = workout.user_id   )}}">
                         <button type="submit"> Muokkaa</button>
                     </form>
                     <form method="post" action="{{ url_for('delete_workout', workout_id=workout.id, workout_user_id=workout.user_id) }}">
                         <button type="submit">Poista</button>
                     </form>
-                    {%endif%}
+                    {%endif%}-->
                 </div>    
             {%endif%}
             <div>
@@ -63,10 +74,11 @@
             </div>
         </fieldset>
     {% endfor %}
-
-    <p>Kirjaudu tai rekisteröidy kommentoidaksesi suorituksia</p>
-    <p><a href="/register">Rekisteröidy</a></p>
-    <p><a href="/">Kirjaudu etusivulta </a></p>
+    {%if not session.user_id%}
+        <p>Kirjaudu tai rekisteröidy kommentoidaksesi suorituksia</p>
+        <p><a href="/register">Rekisteröidy</a></p>
+        <p><a href="/">Kirjaudu etusivulta </a></p>
+    {%endif%}
 </body>
 </html>
 

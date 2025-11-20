@@ -76,7 +76,8 @@ class Database:
         self.connection.commit()
     
     def get_workout(self,workout_id):
-        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts WHERE id = ?", (workout_id,))
+        self.cursor.execute('''SELECT id, title, content, sent_at, workout_level, sport, user_id
+                            FROM workouts WHERE id = ?''', (workout_id,))
         return self.cursor.fetchone()
     
     def get_workouts(self):
@@ -84,7 +85,9 @@ class Database:
         return self.cursor.fetchall()
     
     def get_workouts_by_level(self, workout_level):
-        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts WHERE workout_level = ?", (workout_level,))
+        self.cursor.execute('''SELECT id, title, content, sent_at, workout_level, sport, user_id
+                            FROM workouts WHERE workout_level = ?''',
+                            (workout_level,))
         return self.cursor.fetchall()
     
     def get_sorted_workouts(self, workout_level, sport):
@@ -100,11 +103,16 @@ class Database:
             params.append(sport)
             
         query += " WHERE " + " AND ".join(conditions)
-        
-        print(query)
-        
         self.cursor.execute(query, params)
         return self.cursor.fetchall()
+    
+    def sort_workouts_query(self, sort_query):
+        sort_query = f"%{sort_query}%"
+        self.cursor.execute('''SELECT id, title, content, sent_at,
+                workout_level, sport, user_id FROM workouts
+                WHERE title LIKE ? OR sport LIKE ? OR workout_level LIKE ? ''',
+                (sort_query, sort_query, sort_query))
+        return self.cursor.fetchall() 
             
     
     def delete_workout(self, workout_id):
@@ -112,11 +120,16 @@ class Database:
         self.connection.commit()
     
     def get_workouts_by_user(self, user_id):
-        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport FROM workouts WHERE user_id = ?", (user_id,))
+        self.cursor.execute('''SELECT id, title, content, sent_at, workout_level, sport
+                            FROM workouts WHERE user_id = ?'''
+                            , (user_id,))
         return self.cursor.fetchall()
     
     def edit_workout(self,new_title, new_content, workout_level, sport, workout_id, user_id,):
-        self.cursor.execute("UPDATE workouts SET title = ?, content = ?, workout_level = ?, sport = ? WHERE id = ? AND user_id = ?", (new_title, new_content, workout_level, sport, workout_id, user_id)) 
+        self.cursor.execute('''UPDATE workouts
+                            SET title = ?, content = ?, workout_level = ?, sport = ?
+                            WHERE id = ? AND user_id = ?''',
+                            (new_title, new_content, workout_level, sport, workout_id, user_id)) 
         self.connection.commit()
         
 
@@ -136,6 +149,7 @@ class Database:
     def get_user_by_id(self, username):
         self.cursor.execute("SELECT id, username, password_hash FROM users WHERE username = ?", (username,))
         return self.cursor.fetchone()
+    
     def get_username_by_id(self, user_id):
         self.cursor.execute("SELECT username FROM users WHERE id = ?", (user_id,))
         return self.cursor.fetchone()

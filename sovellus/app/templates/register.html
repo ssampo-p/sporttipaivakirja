@@ -1,15 +1,9 @@
 <html>
-  {% include '_header.html' %}
+  {% include "_header.html" %}
   <head>
     <title>Rekisteröinti</title>
   </head>
-  {% with messages=get_flashed_messages() %}
-    {% if messages %}
-      {% for message in messages %}
-        <p>{{ message }}</p>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
+  {%include "flash_msg.html"%}
   <body>
     <form action="/register" method="post">
       <p>

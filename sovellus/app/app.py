@@ -17,7 +17,7 @@ def sivu1():
     db = Database()
     return render_template("index.html")
 
-
+    
 @app.route("/login", methods=["POST"])
 def login():
     username = request.form["username"]
@@ -32,7 +32,8 @@ def login():
             return redirect("/")
             
         else:
-            return "Virheellinen käyttäjätunnus tai salasana" #TODO fix, so that in case of an error, you are not taken to a different page
+            flash("Väärä käyttäjätunnus tai salasana")
+            return redirect("/")
     except sqlite3.IntegrityError as e:
         return f"Tapahtui virhe: {e}"
     finally:
@@ -53,10 +54,18 @@ def register():
 
     if request.method == "POST":
         username = request.form["username"]
-        if len(username) > 16:
-            abort(403)
+        if len(username) > 16: # should not happen
+            flash("VIRHE: tunnus liian pitkä!")
+            filled = {"username": username}
+            return render_template("register.html", filled=filled)
+        
         password1 = request.form["password1"]
         password2 = request.form["password2"]
+        
+        if not password1.strip():
+            flash("VIRHE: salasana ei voi olla tyhjä!")
+            filled = {"username": username}
+            return render_template("register.html", filled=filled)
 
         if password1 != password2:
             flash("VIRHE: Antamasi salasanat eivät ole samat")
@@ -94,7 +103,14 @@ def own_page(user_id):
             return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts)
         
         for workout in workouts_from_db:  
-            workouts.append(Workout(workout[0], workout[1], workout[2], workout[3],workout[4], workout[5], session["user_id"], session["username"]))
+            workouts.append(Workout(workout[0],
+                                    workout[1],
+                                    workout[2],
+                                    workout[3],
+                                    workout[4],
+                                    workout[5],
+                                    session["user_id"],
+                                    session["username"]))
             
         db.close()
         return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts)
@@ -104,10 +120,6 @@ def own_page(user_id):
         if db:
             db.close()
     
-        
-        
-    
-
 
 @app.route("/new_workout_post", methods=["POST"])
 def new_workout_post():
@@ -120,7 +132,12 @@ def new_workout_post():
     sent_at = datetime.now().isoformat(" ")
     title = request.form["title"]
     workout_level = request.form["workout_level"]
-    sport = request.form["workout_type"]  
+    sport = request.form["workout_type"]
+    check = check_empty_inputs(title, content, "/")
+    if check:
+        return check
+    if not title or len(title) > 100 or len(content) > 5000:
+        abort(403)
     try:
         db = Database()
         db.add_workout(content, sent_at, user_id, title, workout_level, sport)
@@ -155,6 +172,9 @@ def comment_post(workout_id):
     if "user_id" not in session:
         return redirect("/")
     comment_content = request.form["comment_content"]
+    if not comment_content.strip() or len(comment_content) > 500:
+        flash("Et voi lähettää tyhjää kommenttia!")
+        return redirect(url_for("workouts"))
     db = Database()
     db.add_comment_to_workout(workout_id, session["user_id"], comment_content)
     db.close()
@@ -197,26 +217,62 @@ def update_workout(workout_id, workout_user_id):
     new_content = request.form["content"]
     workout_level = request.form["workout_level"]
     sport = request.form["workout_type"]
-    print("sport: ", sport)
-    
+    check = check_empty_inputs(title, new_content, url_for("edit_workout", workout_id=workout_id, workout_user_id=workout_user_id))
+    if check:
+        return check
     db.edit_workout(title, new_content, workout_level,sport, workout_id, session["user_id"])
     db.close 
     
     return redirect(url_for("own_page", user_id=session["user_id"])) 
+
+
+
+def check_empty_inputs(title, content, path):
+    if not title.strip():
+        flash("Postauksen täytyy sisältää otsikko !")
+        return redirect(path)
+    if not content.strip():
+        flash("Postauksen täytyy sisältää viesti !") 
+        return redirect(path)
+    return None
     
-@app.route("/workouts/sort_workouts", methods=["POST"])
+# TODO: make get possible w params   
+@app.route("/workouts/sort_workouts", methods=["POST", "GET"])
 def sort_workouts():
     workout_level = request.form["workout_level"]
     sport = request.form["workout_type"]
     if workout_level == "all" and sport == "all":
         return redirect(url_for("workouts",))
     db = Database()
-    workouts_from_db = db.get_sorted_workouts(workout_level,sport)
+    workouts_from_db = db.get_sorted_workouts(workout_level, sport)
     workouts = []
     create_workouts(db, workouts_from_db, workouts)
     db.close()
         
     return render_template("workouts.html",workouts=workouts)
+
+@app.route("/workouts/search", methods=["POST","GET"])
+def sort_with_query():
+    if request.method == "POST":
+        query = request.form["sort_query"]
+        return redirect(url_for("sort_with_query", sort_query=query))
+        
+    query = request.args["sort_query"]
+    
+    if query == "":
+        return redirect(url_for("workouts",))
+    db = Database()
+    workouts_from_db = db.sort_workouts_query(query)
+    workouts = []
+    create_workouts(db, workouts_from_db, workouts)
+    db.close()
+    
+    return render_template("workouts.html", workouts=workouts ,query = query)
+    
+    
+    
+        
+        
 
 def create_workouts(db, workouts_from_db, workouts):
     for workout in workouts_from_db:
@@ -243,4 +299,4 @@ def delete_workout(workout_id, workout_user_id):
     db.close()
     return redirect(url_for("own_page", user_id=session["user_id"]))
     
-    
+
