@@ -1,4 +1,4 @@
-import sqlite3
+import sqlite3, secrets
 from flask import Flask
 from flask import redirect, render_template, request, session, url_for, abort, flash
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -29,6 +29,7 @@ def login():
         if user and check_password_hash(user[2], password):
             session["username"] = username
             session["user_id"] = user[0]
+            session["csrf_token"] = secrets.token_hex(16)
             return redirect("/")
             
         else:
@@ -127,7 +128,7 @@ def new_workout_post():
     ''' Create a new workout post '''
     if "user_id" not in session:
         return redirect("/")
-    
+    check_csrf() 
     content = request.form["content"]
     user_id = session["user_id"]
     sent_at = datetime.now().isoformat(" ")
@@ -169,6 +170,7 @@ def comment_post(workout_id):
     ''' Creates a new comment on a workout post '''
     if "user_id" not in session:
         return redirect("/")
+    check_csrf()
     comment_content = request.form["comment_content"]
     if not comment_content.strip() or len(comment_content) > 500:
         flash("Et voi lähettää tyhjää kommenttia!")
@@ -182,6 +184,7 @@ def comment_post(workout_id):
 def edit_workout(workout_id, workout_user_id):
     if workout_user_id != session["user_id"]:
         abort(403)
+    check_csrf()
     db = Database()
     workout_from_db = db.get_workout(workout_id)
     #TODO not the best way create workout obj..
@@ -203,7 +206,7 @@ def edit_workout(workout_id, workout_user_id):
  
 @app.route("/update_workout/<int:workout_id>/<int:workout_user_id>", methods=["POST"])
 def update_workout(workout_id, workout_user_id):
-    
+    check_csrf()
     db  = Database()
     workout = db.get_workout(workout_id)
     if not workout or workout_user_id != session["user_id"]:
@@ -231,12 +234,11 @@ def check_empty_inputs(title, content, path):
         flash("Postauksen täytyy sisältää viesti !") 
         return redirect(path)
     return None
-    
-# TODO: make get possible w params   
-@app.route("/workouts/sort_workouts", methods=["POST", "GET"])
+     
+@app.route("/workouts/sort_workouts", methods=["GET"])
 def sort_workouts():
-    workout_level = request.form["workout_level"]
-    sport = request.form["workout_type"]
+    workout_level = request.args.get("workout_level")
+    sport = request.args.get("workout_type")
     if workout_level == "all" and sport == "all":
         return redirect(url_for("workouts",))
     db = Database()
@@ -289,10 +291,14 @@ def create_workouts(db, workouts_from_db, workouts):
 def delete_workout(workout_id, workout_user_id):
     if workout_user_id != session["user_id"]:
         abort(403)
-        
+    check_csrf()
     db = Database()
     db.delete_workout(workout_id)
     db.close()
     return redirect(url_for("own_page", user_id=session["user_id"]))
+
+def check_csrf():
+    if request.form["csrf_token"] != session["csrf_token"]:
+        abort(403)
     
 

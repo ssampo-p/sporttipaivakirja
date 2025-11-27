@@ -59,6 +59,7 @@
                 <option value="kamppailu">Kamppailu</option>
                 <option value="muu">Muu</option>
             </select>
+          <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
           <input type="submit" value="Lähetä" />  
         </fieldset>
       </form>
