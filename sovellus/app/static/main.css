@@ -19,7 +19,7 @@
         margin: 0px;
     }
     .button {
-        background-color: #321ae9;
+        background-color: black;
         border-radius: 20px;
         color: white;
         margin-right: 10px;
@@ -28,6 +28,7 @@
         text-decoration: none;
         font-size: 12px;
         cursor: pointer;
+        font-family: sans-serif;
     }
     .edit-button{
         background-color: green;
