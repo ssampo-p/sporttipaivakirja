@@ -1,30 +1,36 @@
 <!DOCTYPE html>
+
 <html>
-  {% include '_header.html' %}
-  <body>
+  <head>
+    <link rel="stylesheet" href="/static/main.css">
+  </head>
+  <body class="body">
+    {% include '_header.html' %}
     {% if username %}
       <h1>Tervetuloa, {{ username }}!</h1>
+      <div class="user-stats">
+        <p>Olet harjoitellut viimeisen 7 päivän aikana: {{weekly_count}} kertaa</p>
+        <p>Olet harjoitellut viimeisen 30 päivän aikana: {{thirty_days_count}} kertaa</p>
+      </div>
+      <hr>
       <p>Viimeisimmät urheilusuorituksesi:</p>
-      <fieldset>
-        <legend>Omat urheilusuoritukset</legend>
         {% if workouts %}
           {% for workout in workouts %}
-            <div>
+            <article class="workouts">
               <h3>{{ workout.title }}, Taso: {{ workout.workout_level }}, Laji {{ workout.sport }}</h3>
               <p>{{ workout.content }}</p>
               <small>Lisätty: {{ workout.sent_at }}</small>
               <form method="post" action="{{ url_for('edit_workout', workout_id=workout.id, workout_user_id=workout.user_id) }}">
-                <button type="submit">Muokkaa</button>
+                <button class="button edit-button" type="submit">Muokkaa</button>
               </form>
               <form method="post" action="{{ url_for('delete_workout', workout_id=workout.id, workout_user_id=workout.user_id) }}">
-                <button type="submit">Poista</button>
+                <button class="button delete-button" type="submit">Poista</button>
               </form>
-            </div>
+            </article>
           {% endfor %}
         {% else %}
           <p>Sinulla ei ole vielä urheilusuorituksia.</p>
         {% endif %}
-      </fieldset>
     {% else %}
       <h1>Sinun pitää kirjautua sisään nähdäksesi tämän sivun.</h1> <!-- this should not be seen -->
     {% endif %}

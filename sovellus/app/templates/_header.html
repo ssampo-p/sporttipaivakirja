@@ -1,25 +1,27 @@
 {%block head%}
 <head>
-  <title>Main Page</title>  
-   <h1>Tervetuloa Sporttipäiväkirjaan!</h1>
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body class="header">
+  
+    <h1>Tervetuloa Sporttipäiväkirjaan!</h1>
+    <div class="header">
     <a href="{{ url_for("sivu1") }}">
-      <button > Etusivu </button>
+      <button class="button"> Etusivu </button>
     </a>
 
     <a href="{{ url_for("workouts") }}">
-      <button>Kaikki urheilusuoritukset</button>
+      <button class="button">Kaikki urheilusuoritukset</button>
     </a>
     {%if session.user_id %}
     <a href="{{ url_for("own_page", user_id=session["user_id"]) }}">
-      <button>Omat sivut</button>
+      <button class="button">Omat sivut</button>
     </a>
-    
-    <a href="/logout">Kirjaudu ulos</a>
-    
+    <a href="/logout">
+      <button class="button">Kirjaudu ulos</button>
+    </a>
     {% endif %}
-    
-
+    </div>
     <hr>
-  
-  </head>
+</body>
 {% endblock %}

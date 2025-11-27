@@ -62,7 +62,6 @@ class Database:
             comment = row[0]
             print("rivi:", row[1])
             username = self.get_username_by_id(row[1])
-            print("username:", username)
             comments.append((comment, username))
         return comments
             
@@ -152,8 +151,20 @@ class Database:
     
     def get_username_by_id(self, user_id):
         self.cursor.execute("SELECT username FROM users WHERE id = ?", (user_id,))
-        return self.cursor.fetchone()
+        username = self.cursor.fetchone()
+        return username[0]
     
+    def get_workouts_count(self, user_id, timeperiod):
+            if timeperiod == "week":
+                self.cursor.execute('''SELECT COUNT(*)
+                         FROM workouts WHERE user_id = ? AND sent_at >= datetime('now','-7 days')'''
+                        , (user_id,))
+            else:
+                 self.cursor.execute('''SELECT COUNT(*)
+                         FROM workouts WHERE user_id = ? AND sent_at >= datetime('now','-30 days')'''
+                        , (user_id,))
+            row = self.cursor.fetchone()
+            return row[0] if row else 0
     def close(self):
         self.connection.close()
 

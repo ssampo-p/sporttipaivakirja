@@ -1,10 +1,12 @@
 <html>
-  {% include "_header.html" %}
+  
   <head>
     <title>Rekisteröinti</title>
+    <link rel="stylesheet" href="/static/main.css">
   </head>
   {%include "flash_msg.html"%}
-  <body>
+  <body class="body">
+     {% include "_header.html" %}
     <form action="/register" method="post">
       <p>
         Tunnus: <br />

@@ -93,7 +93,6 @@ def own_page(user_id):
     ''' User's own page , can be accessed only when logged in '''
     if user_id != session["user_id"]:
         return abort(403)
-    user_id = session["username"]
     username = session["username"]
     try:
         db = Database()
@@ -111,9 +110,11 @@ def own_page(user_id):
                                     workout[5],
                                     session["user_id"],
                                     session["username"]))
-            
+        weekly_count = db.get_workouts_count(user_id,"week")
+        thirty_days_count = db.get_workouts_count(user_id, "30days")
+        
         db.close()
-        return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts)
+        return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts, weekly_count=weekly_count, thirty_days_count=thirty_days_count)
     except sqlite3.IntegrityError as e:
         flash("Tapahtui virhe oman sivun lataamisessa!")
     finally:

@@ -1,7 +1,10 @@
 <html>
 
-{% include "_header.html" %}
-<body>
+<head>
+  <link rel="stylesheet" href="/static/main.css">
+</head>
+<body class="body">
+  {% include "_header.html" %}
   <h2> Voit sovelluksessa luoda merkintöjä urheilusuorituksista ja  tarkastella + kommentoida muiden suorituksia sivulla "Kaikki urheilusuoritukset"  </h2>
 
   {% if session.username %}
