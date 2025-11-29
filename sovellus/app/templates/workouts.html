@@ -41,6 +41,7 @@
         <button type="submit"> Lajittele hakusanalla </button>    
     </form>
     <br>
+    {%include "flash_msg.html"%}
     {% for workout in workouts %}
         <article class="workouts-outer" >
             <h1>{{workout.sport}}</h1>
