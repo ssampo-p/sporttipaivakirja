@@ -10,11 +10,11 @@
       <button class="button"> Etusivu </button>
     </a>
 
-    <a href="{{ url_for("workouts") }}">
+    <a href="{{ url_for("workouts.workouts") }}">
       <button class="button">Kaikki urheilusuoritukset</button>
     </a>
     {%if session.user_id %}
-    <a href="{{ url_for("own_page", user_id=session["user_id"]) }}">
+    <a href="{{ url_for("users.own_page", user_id=session["user_id"]) }}">
       <button class="button">Omat sivut</button>
     </a>
     <a href="/logout">
