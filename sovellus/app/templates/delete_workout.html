@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="/static/main.css">
+    </head>
+    <body class="body">
+        <h2>Poista suoritus</h2>
+        {%include "flash_msg.html"%}
+        <div class="button-container">
+            <form method="post" action="{{ url_for("delete_workout", workout_id=workout_id, workout_user_id = workout_user_id) }}">
+                <p>Oletko varma, että haluat poistaa suorituksen ?</p>
+                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                <button class="button delete-button" type="submit">Kyllä, poista suoritus</button>
+            </form>
+            <a href="{{ url_for('own_page', user_id=session['user_id']) }}">
+                <button class="button" type="button">Peruuta</button>
+            </a>
+        </div>
+    </body>
+
+
+</html>

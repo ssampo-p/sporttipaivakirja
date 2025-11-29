@@ -2,9 +2,9 @@
 <head>
   <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 </head>
-<body class="header">
+<body class="header-body">
   
-    <h1>Tervetuloa Sporttipäiväkirjaan!</h1>
+    <h1 class="h1">Tervetuloa Sporttipäiväkirjaan!</h1>
     <div class="header">
     <a href="{{ url_for("sivu1") }}">
       <button class="button"> Etusivu </button>
@@ -22,6 +22,7 @@
     </a>
     {% endif %}
     </div>
-    <hr>
+    <hr class="header-hr">
 </body>
+
 {% endblock %}

@@ -7,7 +7,7 @@
   {%include "flash_msg.html"%}
   <body class="body">
      {% include "_header.html" %}
-    <form action="/register" method="post">
+    <form class="login-form" action="/register" method="post">
       <p>
         Tunnus: <br />
         <input type="text" name="username" value="{{ filled.username }}" maxlength="16" />

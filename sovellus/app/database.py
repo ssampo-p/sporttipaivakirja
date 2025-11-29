@@ -59,7 +59,9 @@ class Database:
         rows = self.cursor.fetchall()
         comments = []
         for row in rows:
-            comment = row[0]
+            comment = row[0].strip() 
+            if comment == "":
+                continue # new posts were getting empty comments, this removes them (don't know yet why they were added)
             print("rivi:", row[1])
             username = self.get_username_by_id(row[1])
             comments.append((comment, username))
@@ -164,7 +166,7 @@ class Database:
                          FROM workouts WHERE user_id = ? AND sent_at >= datetime('now','-30 days')'''
                         , (user_id,))
             row = self.cursor.fetchone()
-            return row[0] if row else 0
+            return row[0] 
     def close(self):
         self.connection.close()
 

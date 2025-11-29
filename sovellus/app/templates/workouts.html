@@ -21,16 +21,16 @@
         <label for="workout_type">Lajittele urheilulajin mukaan:</label>
         <select name="workout_type" id="workout_type">
             <option value="all">Kaikki</option>
-            <option value="jääkiekko">Jääkiekko</option>
-            <option value="jalkapallo">Jalkapallo</option>
-            <option value="juoksu">Juoksu</option>
-            <option value="kuntosali">Kuntosali</option>
-            <option value="pyöräily">Pyöräily</option>
-            <option value="tennis">Tennis</option>
-            <option value="padel">Padel</option>
-            <option value="lentopallo">Lentopallo</option>
-            <option value="kamppailu">Kamppailu</option>
-            <option value="muu">Muu</option>
+            <option value="Jääkiekko">Jääkiekko</option>
+            <option value="Jalkapallo">Jalkapallo</option>
+            <option value="Juoksu">Juoksu</option>
+            <option value="Kuntosali">Kuntosali</option>
+            <option value="Pyöräily">Pyöräily</option>
+            <option value="Tennis">Tennis</option>
+            <option value="Padel">Padel</option>
+            <option value="Lentopallo">Lentopallo</option>
+            <option value="Kamppailu">Kamppailu</option>
+            <option value="Muu">Muu</option>
         </select>
         <button type="submit"> Lajittele </button>
     </form>
@@ -42,14 +42,12 @@
     </form>
     <br>
     {% for workout in workouts %}
-        <article class="workouts" >
+        <article class="workouts-outer" >
             <h1>{{workout.sport}}</h1>
-            <small>Lisätty: {{ workout.sent_at }}, Käyttäjältä: {{ workout.username }}</small>
+            <small class="small-text">Lisätty: {{ workout.sent_at }}, Käyttäjältä: {{ workout.username }}</small>
             <article class="workouts" >
-                <fieldset>
                 <h3>Otsikko: {{ workout.title }}, Taso: {{ workout.workout_level }}, Laji: {{workout.sport}}</h3>
                 <p>{{ workout.content }}</p>
-                </fieldset>
                 <form method="post" action="{{ url_for("comment_post", workout_id=workout.id) }}">
                         <textarea name="comment_content" rows="3" cols="40" maxlength="500"></textarea><br>
                         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">

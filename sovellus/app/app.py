@@ -6,7 +6,11 @@ from database import Database
 import config
 from datetime import datetime
 from workout import Workout
+import utils 
 
+
+#TODO: distribute the code in this file to other files as the app grows larger
+#TODO: add error handling where missing
 
 
 app = Flask(__name__)
@@ -100,9 +104,13 @@ def own_page(user_id):
         workouts_from_db = db.get_workouts_by_user(session["user_id"])
         workouts = []
         if not workouts_from_db:
-            return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts)
+            weekly_count = 0
+            thirty_days_count = 0
+            db.close()
+            return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts, weekly_count=weekly_count, thirty_days_count=thirty_days_count)
         
-        for workout in workouts_from_db:  
+        for workout in workouts_from_db:
+            comments_from_db = db.get_workout_comments(workout[0])  
             workouts.append(Workout(workout[0],
                                     workout[1],
                                     workout[2],
@@ -110,10 +118,11 @@ def own_page(user_id):
                                     workout[4],
                                     workout[5],
                                     session["user_id"],
-                                    session["username"]))
+                                    session["username"],
+                                    comments_from_db,
+                                    ))
         weekly_count = db.get_workouts_count(user_id,"week")
-        thirty_days_count = db.get_workouts_count(user_id, "30days")
-        
+        thirty_days_count = db.get_workouts_count(user_id, "30days") 
         db.close()
         return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts, weekly_count=weekly_count, thirty_days_count=thirty_days_count)
     except sqlite3.IntegrityError as e:
@@ -296,6 +305,16 @@ def delete_workout(workout_id, workout_user_id):
     db.delete_workout(workout_id)
     db.close()
     return redirect(url_for("own_page", user_id=session["user_id"]))
+
+@app.route("/delete_workout/confirmation/<int:workout_id>/<int:workout_user_id>/",methods=["POST"])
+def delete_workout_confirmation(workout_id, workout_user_id):
+    if workout_user_id != session["user_id"]:
+        abort(403)
+    check_csrf()
+    return render_template("delete_workout.html", workout_id=workout_id, workout_user_id=workout_user_id)
+
+
+
 
 def check_csrf():
     if request.form["csrf_token"] != session["csrf_token"]:
