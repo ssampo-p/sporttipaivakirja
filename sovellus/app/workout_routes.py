@@ -60,7 +60,7 @@ def comment_post(workout_id):
     comment_content = request.form["comment_content"]
     if not comment_content.strip() or len(comment_content) > 500:
         flash("Et voi lähettää tyhjää kommenttia!")
-        return redirect(url_for("workouts"))
+        return redirect(url_for("workouts.workouts"))
     db = Database()
     db.add_comment_to_workout(workout_id, session["user_id"], comment_content)
     db.close()
@@ -102,13 +102,13 @@ def update_workout(workout_id, workout_user_id):
     new_content = request.form["content"]
     workout_level = request.form["workout_level"]
     sport = request.form["workout_type"]
-    check = utils.check_empty_inputs(title, new_content, url_for("edit_workout", workout_id=workout_id, workout_user_id=workout_user_id))
+    check = utils.check_empty_inputs(title, new_content, url_for("workouts.edit_workout", workout_id=workout_id, workout_user_id=workout_user_id))
     if check:
         return check
     db.edit_workout(title, new_content, workout_level,sport, workout_id, session["user_id"])
     db.close 
     
-    return redirect(url_for("own_page", user_id=session["user_id"])) 
+    return redirect(url_for("users.own_page", user_id=session["user_id"])) 
 
 
      
@@ -117,7 +117,7 @@ def sort_workouts():
     workout_level = request.args.get("workout_level")
     sport = request.args.get("workout_type")
     if workout_level == "all" and sport == "all":
-        return redirect(url_for("workouts",))
+        return redirect(url_for("workouts.workouts",))
     db = Database()
     workouts_from_db = db.get_sorted_workouts(workout_level, sport)
     workouts = []
@@ -130,12 +130,12 @@ def sort_workouts():
 def sort_with_query():
     if request.method == "POST":
         query = request.form["sort_query"]
-        return redirect(url_for("sort_with_query", sort_query=query))
+        return redirect(url_for("workouts.sort_with_query", sort_query=query))
         
     query = request.args["sort_query"]
     
     if query == "":
-        return redirect(url_for("workouts",))
+        return redirect(url_for("workouts.workouts",))
     db = Database()
     workouts_from_db = db.sort_workouts_query(query)
     workouts = []
@@ -155,7 +155,7 @@ def delete_workout(workout_id, workout_user_id):
     db = Database()
     db.delete_workout(workout_id)
     db.close()
-    return redirect(url_for("own_page", user_id=session["user_id"]))
+    return redirect(url_for("users.own_page", user_id=session["user_id"]))
 
 @workouts_bp.route("/delete_workout/confirmation/<int:workout_id>/<int:workout_user_id>/",methods=["POST"])
 def delete_workout_confirmation(workout_id, workout_user_id):

@@ -93,7 +93,7 @@ class Database:
         return self.cursor.fetchall()
     
     def get_sorted_workouts(self, workout_level, sport):
-        query = "SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts ORDER BY sent_at DESC"
+        query = "SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts"
         conditions = []
         params = []
         if workout_level != "all":
@@ -105,6 +105,7 @@ class Database:
             params.append(sport)
             
         query += " WHERE " + " AND ".join(conditions)
+        query += " ORDER BY sent_at DESC"
         self.cursor.execute(query, params)
         return self.cursor.fetchall()
     
