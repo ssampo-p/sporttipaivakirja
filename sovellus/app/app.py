@@ -25,6 +25,7 @@ app.secret_key = config.secret_key
 app.register_blueprint(workouts_bp)
 app.register_blueprint(users_bp)
 
+
 @app.route("/")
 def sivu1():
     db = Database()

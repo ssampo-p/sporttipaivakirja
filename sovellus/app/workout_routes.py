@@ -70,7 +70,8 @@ def comment_post(workout_id):
 def edit_workout(workout_id, workout_user_id):
     if workout_user_id != session["user_id"]:
         abort(403)
-    utils.check_csrf()
+    if request.method == "POST": # to show the edit form if check_empty_inputs fails
+        utils.check_csrf()
     db = Database()
     workout_from_db = db.get_workout(workout_id)
     #TODO not the best way create workout obj..
@@ -106,7 +107,7 @@ def update_workout(workout_id, workout_user_id):
     if check:
         return check
     db.edit_workout(title, new_content, workout_level,sport, workout_id, session["user_id"])
-    db.close 
+    db.close() 
     
     return redirect(url_for("users.own_page", user_id=session["user_id"])) 
 
