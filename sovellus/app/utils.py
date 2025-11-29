@@ -32,5 +32,5 @@ def create_workouts(db, workouts_from_db, workouts):
         
 
 def check_csrf():
-    if request.form["csrf_token"] != session["csrf_token"]:
+    if session["csrf_token"] != request.form["csrf_token"]:
         abort(403)
