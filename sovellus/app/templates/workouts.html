@@ -10,7 +10,7 @@
     {%include "_header.html"%}
     <h1>Kaikki urheilusuoritukset</h1>
 
-    <form method="get" action="{{url_for("sort_workouts")}}">
+    <form method="get" action="{{url_for("workouts.sort_workouts")}}">
         <label for="workout_level">Lajittele vaativuuden mukaan:</label>
         <select name="workout_level" id="workout_level">
             <option value="all">Kaikki</option>
@@ -35,7 +35,7 @@
         <button type="submit"> Lajittele </button>
     </form>
     <br>
-    <form method="post" action="{{url_for("sort_with_query")}}">
+    <form method="post" action="{{url_for("workouts.sort_with_query")}}">
        <label for="sort_query">Lajittele hakusanan mukaan:</label>
         <input type="text" name="sort_query" value="{{query}}" />
         <button type="submit"> Lajittele hakusanalla </button>    
@@ -48,7 +48,7 @@
             <article class="workouts" >
                 <h3>Otsikko: {{ workout.title }}, Taso: {{ workout.workout_level }}, Laji: {{workout.sport}}</h3>
                 <p>{{ workout.content }}</p>
-                <form method="post" action="{{ url_for("comment_post", workout_id=workout.id) }}">
+                <form method="post" action="{{ url_for("workouts.comment_post", workout_id=workout.id) }}">
                         <textarea name="comment_content" rows="3" cols="40" maxlength="500"></textarea><br>
                         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                         <input type="submit" value="Lähetä kommentti">

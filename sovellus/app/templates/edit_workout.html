@@ -7,7 +7,7 @@
     <body>
         <h2>Muokkaa suoritusta</h2>
         {%include "flash_msg.html"%}
-        <form method="post" action="{{ url_for("update_workout", workout_id=workout.id, workout_user_id = workout.user_id) }}">
+        <form method="post" action="{{ url_for("workouts.workouts.update_workout", workout_id=workout.id, workout_user_id = workout.user_id) }}">
             <label for="title">Sisältö:</label><br>
             <textarea name="title" rows="1" cols="30">{{workout.title}}</textarea><br>
             
@@ -59,6 +59,6 @@
 
             <input type="submit" value="Tallenna">
         </form>
-        <a href="{{ url_for("own_page", user_id=session["user_id"]) }}">Palaa takaisin</a>
+        <a href="{{ url_for("users.own_page", user_id=session["user_id"]) }}">Palaa takaisin</a>
     </body>
 </html>
