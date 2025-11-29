@@ -11,6 +11,9 @@ import utils
 
 #TODO: distribute the code in this file to other files as the app grows larger
 #TODO: add error handling where missing
+#TODO: add pagination to workouts page
+#TODO: add ability to delete comments
+#TODO: add timestamps to comments
 
 
 app = Flask(__name__)

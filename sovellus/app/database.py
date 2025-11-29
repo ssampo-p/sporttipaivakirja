@@ -48,6 +48,7 @@ class Database:
     
     
     def add_comment_to_workout(self, workout_id, user_id, content):
+        
         self.cursor.execute("""
             INSERT INTO comment_threads (comment, user_id, workout_id)
             VALUES (?, ?, ?)
@@ -82,17 +83,17 @@ class Database:
         return self.cursor.fetchone()
     
     def get_workouts(self):
-        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts") 
+        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts ORDER BY sent_at DESC") 
         return self.cursor.fetchall()
     
     def get_workouts_by_level(self, workout_level):
         self.cursor.execute('''SELECT id, title, content, sent_at, workout_level, sport, user_id
-                            FROM workouts WHERE workout_level = ?''',
+                            FROM workouts WHERE workout_level = ? ORDER BY sent_at DESC''',
                             (workout_level,))
         return self.cursor.fetchall()
     
     def get_sorted_workouts(self, workout_level, sport):
-        query = "SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts"
+        query = "SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts ORDER BY sent_at DESC"
         conditions = []
         params = []
         if workout_level != "all":
@@ -111,7 +112,7 @@ class Database:
         sort_query = f"%{sort_query}%"
         self.cursor.execute('''SELECT id, title, content, sent_at,
                 workout_level, sport, user_id FROM workouts
-                WHERE title LIKE ? OR sport LIKE ? OR workout_level LIKE ? ''',
+                WHERE title LIKE ? OR sport LIKE ? OR workout_level LIKE ? ORDER BY sent_at DESC ''',
                 (sort_query, sort_query, sort_query))
         return self.cursor.fetchall() 
             
@@ -122,7 +123,7 @@ class Database:
     
     def get_workouts_by_user(self, user_id):
         self.cursor.execute('''SELECT id, title, content, sent_at, workout_level, sport
-                            FROM workouts WHERE user_id = ?'''
+                            FROM workouts WHERE user_id = ? ORDER BY sent_at DESC'''
                             , (user_id,))
         return self.cursor.fetchall()
     
