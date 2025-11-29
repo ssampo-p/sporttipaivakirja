@@ -30,6 +30,7 @@ def new_workout_post():
         db = Database()
         db.add_workout(content, sent_at, user_id, title, workout_level, sport)
         db.close()
+        flash("Uusi suorituksesi on tallennettu!")
         return redirect("/")
     except sqlite3.IntegrityError as e:
         flash("VIRHE: suoritusta ei voitu tallentaa")
