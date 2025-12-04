@@ -18,12 +18,12 @@
           {% for workout in workouts %}
             <article class="workouts">
               <h3>{{ workout.title }}, Taso: {{ workout.workout_level }}, Laji {{ workout.sport }}</h3>
-              <p>{{ workout.content }}</p>
+              <p>{{ workout.content | show_lines }}</p>
               <small>Lisätty: {{ workout.sent_at }}</small>
               <h2>Kommentit: </h2>
                     {% for comment in workout.get_comments() %}
-                    <div>
-                        <p>{{ comment[0] }}</p>
+                    <div class="comment">
+                        <p >{{ comment[0] | show_lines}}</p>
                         <small>Käyttäjältä: {{ comment[1] }}</small>
                     </div>
                 {% endfor %}

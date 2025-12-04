@@ -5,6 +5,13 @@ from database import Database
 import config
 from datetime import datetime
 from workout import Workout
+import markupsafe
+
+
+def show_lines(content):
+    content = str(markupsafe.escape(content))
+    content = content.replace("\n", "<br />")
+    return markupsafe.Markup(content)
 
 
 def check_empty_inputs(title, content, path):

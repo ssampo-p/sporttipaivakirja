@@ -82,6 +82,14 @@ class Database:
                             FROM workouts WHERE id = ?''', (workout_id,))
         return self.cursor.fetchone()
     
+    def get_workouts_w_page(self, page_num, page_size):
+        limit = page_size
+        offset = page_size * (page_num - 1)
+        self.cursor.execute('''SELECT id, title, content, sent_at, workout_level,
+                            sport, user_id FROM workouts ORDER BY sent_at DESC LIMIT ? OFFSET ?''', (limit, offset)) 
+        return self.cursor.fetchall()
+    
+    
     def get_workouts(self):
         self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts ORDER BY sent_at DESC") 
         return self.cursor.fetchall()
@@ -169,6 +177,12 @@ class Database:
                         , (user_id,))
             row = self.cursor.fetchone()
             return row[0] 
+    def get_workout_count(self):
+        self.cursor.execute("SELECT COUNT(*) FROM workouts")
+        row = self.cursor.fetchone()
+        return row[0]
+                        
+        
     def close(self):
         self.connection.close()
 

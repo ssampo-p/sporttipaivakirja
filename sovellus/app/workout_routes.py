@@ -6,6 +6,7 @@ import config
 from datetime import datetime
 from workout import Workout
 import utils 
+from math import ceil
 
 workouts_bp = Blueprint('workouts', __name__)
 
@@ -37,20 +38,38 @@ def new_workout_post():
         return redirect("/")
     finally:
         db.close
-    
-    
+
 @workouts_bp.route("/workouts")
-def workouts():
-    ''' Page showing all workout posts '''
+def workouts_redirect():
+    return redirect("/workouts/1")
+    
+@workouts_bp.route("/workouts/<int:page_num>")
+def workouts(page_num):
+    page_size = 2
     db = Database()
-    workouts_from_db = db.get_workouts()
+
+    workout_count = db.get_workout_count()
+    page_count = max(ceil(workout_count / page_size), 1)
+    
+    if page_num < 1:
+        flash("Tämä on ensimmäinen sivu !")
+        return redirect("/workouts/1")
+    if page_num > page_count:
+        flash("Tämä on viimeinen sivu !")
+        return redirect(f"/workouts/{page_count}")
+    
+    workouts_from_db = db.get_workouts_w_page(page_num, page_size)
+
     workouts = []
     if not workouts_from_db:
         db.close()
-        return render_template("workouts.html", workouts=workouts)  
-    utils.create_workouts(db,workouts_from_db, workouts)        
+        return render_template("workouts.html", workouts=workouts, page_num=page_num, page_count=page_count)
+
+    utils.create_workouts(db, workouts_from_db, workouts)
     db.close()
-    return render_template("workouts.html", workouts=workouts)
+
+    return render_template("workouts.html", workouts=workouts, page_num=page_num, page_count=page_count)
+
 
 @workouts_bp.route("/comment_post/<int:workout_id>", methods=["POST"])
 def comment_post(workout_id):
@@ -119,14 +138,14 @@ def sort_workouts():
     workout_level = request.args.get("workout_level")
     sport = request.args.get("workout_type")
     if workout_level == "all" and sport == "all":
-        return redirect(url_for("workouts.workouts",))
+        return redirect(url_for("workouts.workouts",page_num=1))
     db = Database()
     workouts_from_db = db.get_sorted_workouts(workout_level, sport)
     workouts = []
     utils.create_workouts(db, workouts_from_db, workouts)
     db.close()
         
-    return render_template("workouts.html",workouts=workouts)
+    return render_template("workouts.html",workouts=workouts, page_num=1, page_count=1)
 
 @workouts_bp.route("/workouts/search", methods=["POST","GET"])
 def sort_with_query():
@@ -137,14 +156,14 @@ def sort_with_query():
     query = request.args["sort_query"]
     
     if query == "":
-        return redirect(url_for("workouts.workouts",))
+        return redirect(url_for("workouts.workouts", page_num=1))
     db = Database()
     workouts_from_db = db.sort_workouts_query(query)
     workouts = []
     utils.create_workouts(db, workouts_from_db, workouts)
     db.close()
     
-    return render_template("workouts.html", workouts=workouts ,query = query)
+    return render_template("workouts.html", workouts=workouts ,query = query, page_num=1, page_count=1)
     
     
 
