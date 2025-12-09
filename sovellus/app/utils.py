@@ -41,3 +41,39 @@ def create_workouts(db, workouts_from_db, workouts):
 def check_csrf():
     if session["csrf_token"] != request.form["csrf_token"]:
         abort(403)
+
+# 3 functions because of pagination 
+first_page = "Tämä on ensimmäinen sivu !"
+last_page = "Tämä on viimeinen sivu !"
+def check_page_num(page_num, page_count):
+    if page_num < 1:
+        flash(first_page)
+        return redirect(f"/workouts/1")
+    if page_num > page_count:
+        flash(last_page)
+        return redirect(f"/workouts/{page_count}")
+    
+def check_page_sort(page_num, page_count, workout_level, workout_type):
+    if page_num < 1:
+        flash(first_page)
+        return redirect(url_for("workouts.sort_workouts",
+                                workout_level=workout_level,
+                                workout_type=workout_type,
+                                page_num=1))
+    if page_num > page_count:
+        flash(last_page)
+        return redirect(url_for("workouts.sort_workouts",
+                                workout_level=workout_level,
+                                workout_type=workout_type,
+                                page_num=page_count))
+def check_page_sort_query(page_num, page_count, query):
+    if page_num < 1:
+        flash(first_page)
+        return redirect(url_for("workouts.sort_with_query",
+                                sort_query=query,
+                                page_num=1))
+    if page_num > page_count:
+        flash(last_page)
+        return redirect(url_for("workouts.sort_with_query",
+                                sort_query=query,
+                                page_num=page_count))

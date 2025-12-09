@@ -10,32 +10,49 @@
     {%include "_header.html"%}
     <h1>Kaikki urheilusuoritukset</h1>
 
-    <form method="get" action="{{url_for("workouts.sort_workouts")}}">
+    <form method="post" action="{{url_for("workouts.sort_workouts", page_num=1)}}">
+        <!--now user can see what is used in search-->
+        {%set workout_types={
+                        "all": "Kaikki",
+                        "Jääkiekko": "Jääkiekko",
+                        "Jalkapallo" :"Jalkapallo",
+                        "Juoksu":"Juoksu",
+                        "Kuntosali":"Kuntosali",
+                        "Pyöräily": "Pyöräily",
+                        "Tennis": "Tennis",
+                        "Padel": "Padel",
+                        "Lentopallo": "Lentopallo",
+                        "Kamppailu": "Kamppailu",
+                        "Muu": "Muu"
+                    }%}
+        {%set workout_levels ={
+                        "all": "Kaikki",
+                        "helppo": "Helppo",
+                        "keskitaso": "Keskitaso",
+                        "vaikea" : "Kova"
+        }%}
         <label for="workout_level">Lajittele vaativuuden mukaan:</label>
         <select name="workout_level" id="workout_level">
-            <option value="all">Kaikki</option>
-            <option value="helppo">Helppo</option>
-            <option value="keskitaso">Keskitaso</option>
-            <option value="kova">Vaikea</option>
+            {% for level_key, level_value in workout_levels.items() %}
+                <option value= "{{ level_key}}"
+                    {% if workout_level is defined and workout_level == level_key %} selected {% endif %}>
+                    {{ level_value }}
+                </option>
+            {% endfor %}
         </select>
         <label for="workout_type">Lajittele urheilulajin mukaan:</label>
         <select name="workout_type" id="workout_type">
-            <option value="all">Kaikki</option>
-            <option value="Jääkiekko">Jääkiekko</option>
-            <option value="Jalkapallo">Jalkapallo</option>
-            <option value="Juoksu">Juoksu</option>
-            <option value="Kuntosali">Kuntosali</option>
-            <option value="Pyöräily">Pyöräily</option>
-            <option value="Tennis">Tennis</option>
-            <option value="Padel">Padel</option>
-            <option value="Lentopallo">Lentopallo</option>
-            <option value="Kamppailu">Kamppailu</option>
-            <option value="Muu">Muu</option>
+            {% for type_key, type_value in workout_types.items()%}
+                <option value="{{ type_key}}"
+                    {% if workout_type is defined and workout_type == type_key %} selected {% endif %}>
+                    {{ type_value }}
+                </option>
+            {% endfor %}
         </select>
         <button type="submit"> Lajittele </button>
     </form>
     <br>
-    <form method="post" action="{{url_for("workouts.sort_with_query")}}">
+    <form method="post" action="{{url_for("workouts.sort_with_query", page_num=1)}}">
        <label for="sort_query">Lajittele hakusanan mukaan:</label>
         <input type="text" name="sort_query" value="{{query}}" />
         <button type="submit"> Lajittele hakusanalla </button>    
@@ -65,11 +82,32 @@
             </article>
         </article>
     {% endfor %}
-     
-    <p>
+    
+   <p>
+    <!--check which type of pagination to show. maybe not the best solution but works-->
+    {% if query is defined %}
+        <a href="{{ url_for('workouts.sort_with_query',
+                            sort_query=query,
+                            page_num=page_num - 1) }}">&lt;&lt;</a>
+        Sivu {{ page_num }}/{{ page_count }}
+        <a href="{{ url_for('workouts.sort_with_query',
+                            sort_query=query,
+                            page_num=page_num + 1) }}">&gt;&gt;</a>
+    {% elif workout_level is defined and workout_type is defined %}
+        <a href="{{ url_for('workouts.sort_workouts',
+                            workout_level=workout_level,
+                            workout_type=workout_type,
+                            page_num=page_num - 1) }}">&lt;&lt;</a>
+        Sivu {{ page_num }}/{{ page_count }}
+        <a href="{{ url_for('workouts.sort_workouts',
+                            workout_level=workout_level,
+                            workout_type=workout_type,
+                            page_num=page_num + 1) }}">&gt;&gt;</a>
+    {% else %}
         <a href="/workouts/{{ page_num - 1 }}">&lt;&lt;</a>
-            Sivu {{ page_num }}/{{ page_count }}
+        Sivu {{ page_num }}/{{ page_count }}
         <a href="/workouts/{{ page_num + 1 }}">&gt;&gt;</a>
+    {% endif %}
     </p>
     {%if not session.user_id%}
         <p>Kirjaudu tai rekisteröidy kommentoidaksesi suorituksia</p>
