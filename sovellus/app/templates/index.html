@@ -21,11 +21,11 @@
        <fieldset class="fieldset">
           <legend> Uusi Urheilusuoritus</legend>
           <p>
-            Otsikko: <br />
+            <label for="title">Otsikko: </label><br />
             <input type="text" name="title" />
           </p>
           <p>
-            Viesti: <br />
+            <label for="content">Kuvaus: </label><br />
             <textarea name="content" rows="7" cols="50"></textarea>
           </p>
    
@@ -71,11 +71,11 @@
   <form class= "login-form" action="/login" method="post">
     <p>Kirjaudu sisään:</p>
     <p>
-      Tunnus: <br />
+      <label for="username">Käyttäjätunnus: </label><br />
       <input type="text" name="username" />
     </p>
     <p>
-      Salasana: <br />
+      <label for="password">Salasana: </label><br />
       <input type="password" name="password" />
     </p>
     <input type="submit" value="Kirjaudu" />

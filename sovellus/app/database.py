@@ -182,7 +182,9 @@ class Database:
         row = self.cursor.fetchone()
         return row[0]
     
+    
     def delete_comments(self, workout_id):
+        #could be optimized with foreign keys and cascade delete
         self.cursor.execute("DELETE FROM comments WHERE workout_id = ?",(workout_id,))
         self.connection.commit()
     

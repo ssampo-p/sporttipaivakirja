@@ -50,6 +50,7 @@
                 <h3>Otsikko: {{ workout.title }}, Taso: {{ workout.workout_level }}, Laji: {{workout.sport}}</h3>
                 <p>{{ workout.content | show_lines }}</p>
                 <form method="post" action="{{ url_for("workouts.comment_post", workout_id=workout.id) }}">
+                        <label for="comment_content">Lisää kommentti:</label><br>
                         <textarea name="comment_content" rows="3" cols="40" maxlength="500"></textarea><br>
                         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                         <input type="submit" value="Lähetä kommentti">
