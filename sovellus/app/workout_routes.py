@@ -174,6 +174,7 @@ def delete_workout(workout_id, workout_user_id):
         abort(403)
     utils.check_csrf()
     db = Database()
+    db.delete_comments(workout_id)
     db.delete_workout(workout_id)
     db.close()
     return redirect(url_for("users.own_page", user_id=session["user_id"]))

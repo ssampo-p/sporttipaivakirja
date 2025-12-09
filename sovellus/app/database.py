@@ -37,7 +37,7 @@ class Database:
         """)
         
         self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS comment_threads (
+            CREATE TABLE IF NOT EXISTS comments (
             id INTEGER PRIMARY KEY,
                 comment TEXT,
                 user_id INTEGER REFERENCES users,
@@ -50,13 +50,13 @@ class Database:
     def add_comment_to_workout(self, workout_id, user_id, content):
         
         self.cursor.execute("""
-            INSERT INTO comment_threads (comment, user_id, workout_id)
+            INSERT INTO comments (comment, user_id, workout_id)
             VALUES (?, ?, ?)
         """, (content, user_id, workout_id))
         self.connection.commit()
         
     def get_workout_comments(self, workout_id):
-        self.cursor.execute("SELECT comment, user_id FROM comment_threads WHERE workout_id = ?", (workout_id,))       
+        self.cursor.execute("SELECT comment, user_id FROM comments WHERE workout_id = ?", (workout_id,))       
         rows = self.cursor.fetchall()
         comments = []
         for row in rows:
@@ -181,7 +181,11 @@ class Database:
         self.cursor.execute("SELECT COUNT(*) FROM workouts")
         row = self.cursor.fetchone()
         return row[0]
-                        
+    
+    def delete_comments(self, workout_id):
+        self.cursor.execute("DELETE FROM comments WHERE workout_id = ?",(workout_id,))
+        self.connection.commit()
+    
         
     def close(self):
         self.connection.close()
