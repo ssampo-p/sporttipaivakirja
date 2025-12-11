@@ -70,6 +70,7 @@
                         <label for="comment_content">Lisää kommentti:</label><br>
                         <textarea name="comment_content" rows="3" cols="40" maxlength="500"></textarea><br>
                         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                        <input type="hidden" name="return_to_same" value="{{ request.full_path }}">
                         <input type="submit" value="Lähetä kommentti">
                 </form>
                 <h2>Kommentit: </h2>

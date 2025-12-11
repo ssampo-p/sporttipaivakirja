@@ -90,7 +90,8 @@ def comment_post(workout_id):
     db = Database()
     db.add_comment_to_workout(workout_id, session["user_id"], comment_content)
     db.close()
-    return redirect("/workouts")
+    return_to_same = request.form.get("return_to_same") # hidden input to return to same page after comment    
+    return redirect(return_to_same if return_to_same else url_for("workouts.workouts"))
 
 @workouts_bp.route("/edit_workout/<int:workout_id>/<int:workout_user_id>", methods=["POST", "GET"])
 def edit_workout(workout_id, workout_user_id):
