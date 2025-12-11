@@ -7,17 +7,17 @@
   {%include "flash_msg.html"%}
   <body class="body">
      {% include "_header.html" %}
-    <form class="login-form" action="/register" method="post">
+    <form class="login-form" action="/register" method="post" >
       <p>
-        Tunnus: <br />
+        <label for="username">Käyttäjätunnus: </label><br />
         <input type="text" name="username" value="{{ filled.username }}" maxlength="16" />
       </p>
       <p>
-        Salasana: <br />
+        <label for="password1">Salasana: </label><br />
         <input type="password" name="password1" />
       </p>
       <p>
-        Salasana uudestaan: <br />
+        <label for="password2">Salasana uudestaan: </label> <br />
         <input type="password" name="password2" />
       </p>
       <input type="submit" value="Luo tunnus" />

@@ -12,7 +12,7 @@ CREATE TABLE users (
                 username TEXT UNIQUE,
                 password_hash TEXT
             );
-CREATE TABLE comment_threads (
+CREATE TABLE comments (
             id INTEGER PRIMARY KEY,
                 comment TEXT,
                 user_id INTEGER REFERENCES users,

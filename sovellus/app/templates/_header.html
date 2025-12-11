@@ -10,7 +10,7 @@
       <button class="button"> Etusivu </button>
     </a>
 
-    <a href="{{ url_for("workouts.workouts") }}">
+    <a href="{{ url_for("workouts.workouts", page_num=1) }}">
       <button class="button">Kaikki urheilusuoritukset</button>
     </a>
     {%if session.user_id %}

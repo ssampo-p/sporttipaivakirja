@@ -37,7 +37,7 @@ class Database:
         """)
         
         self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS comment_threads (
+            CREATE TABLE IF NOT EXISTS comments (
             id INTEGER PRIMARY KEY,
                 comment TEXT,
                 user_id INTEGER REFERENCES users,
@@ -50,13 +50,13 @@ class Database:
     def add_comment_to_workout(self, workout_id, user_id, content):
         
         self.cursor.execute("""
-            INSERT INTO comment_threads (comment, user_id, workout_id)
+            INSERT INTO comments (comment, user_id, workout_id)
             VALUES (?, ?, ?)
         """, (content, user_id, workout_id))
         self.connection.commit()
         
     def get_workout_comments(self, workout_id):
-        self.cursor.execute("SELECT comment, user_id FROM comment_threads WHERE workout_id = ?", (workout_id,))       
+        self.cursor.execute("SELECT comment, user_id FROM comments WHERE workout_id = ?", (workout_id,))       
         rows = self.cursor.fetchall()
         comments = []
         for row in rows:
@@ -82,6 +82,14 @@ class Database:
                             FROM workouts WHERE id = ?''', (workout_id,))
         return self.cursor.fetchone()
     
+    def get_workouts_w_page(self, page_num, page_size):
+        limit = page_size
+        offset = page_size * (page_num - 1)
+        self.cursor.execute('''SELECT id, title, content, sent_at, workout_level,
+                            sport, user_id FROM workouts ORDER BY sent_at DESC LIMIT ? OFFSET ?''', (limit, offset)) 
+        return self.cursor.fetchall()
+    
+    
     def get_workouts(self):
         self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts ORDER BY sent_at DESC") 
         return self.cursor.fetchall()
@@ -92,10 +100,13 @@ class Database:
                             (workout_level,))
         return self.cursor.fetchall()
     
-    def get_sorted_workouts(self, workout_level, sport):
+    def get_sorted_workouts(self, workout_level, sport, page_num, page_size):
+        limit = page_size
+        offset = page_size * (page_num - 1)
         query = "SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts"
         conditions = []
         params = []
+        
         if workout_level != "all":
             conditions.append("workout_level = ?")
             params.append(workout_level)
@@ -105,16 +116,19 @@ class Database:
             params.append(sport)
             
         query += " WHERE " + " AND ".join(conditions)
-        query += " ORDER BY sent_at DESC"
+        query += " ORDER BY sent_at DESC LIMIT ? OFFSET ?"
+        params.extend([limit, offset])
         self.cursor.execute(query, params)
         return self.cursor.fetchall()
     
-    def sort_workouts_query(self, sort_query):
+    def sort_workouts_query(self, sort_query, page_num, page_size):
+        limit = page_size
+        offset = page_size * (page_num - 1)
         sort_query = f"%{sort_query}%"
         self.cursor.execute('''SELECT id, title, content, sent_at,
                 workout_level, sport, user_id FROM workouts
-                WHERE title LIKE ? OR sport LIKE ? OR workout_level LIKE ? ORDER BY sent_at DESC ''',
-                (sort_query, sort_query, sort_query))
+                WHERE title LIKE ? OR sport LIKE ? OR workout_level LIKE ? ORDER BY sent_at DESC LIMIT ? OFFSET ?''',
+                (sort_query, sort_query, sort_query, limit, offset))
         return self.cursor.fetchall() 
             
     
@@ -169,6 +183,44 @@ class Database:
                         , (user_id,))
             row = self.cursor.fetchone()
             return row[0] 
+        
+    def get_workout_count(self):
+        self.cursor.execute("SELECT COUNT(*) FROM workouts")
+        row = self.cursor.fetchone()
+        return row[0]
+    
+    def sorted_workout_count(self, workout_level, sport):
+        query = "SELECT COUNT(*) FROM workouts"
+        conditions = []
+        params = []
+        if workout_level != "all":
+            conditions.append("workout_level = ?")
+            params.append(workout_level)
+
+        if sport != "all":
+            conditions.append("sport = ?")
+            params.append(sport)
+            
+        query += " WHERE " + " AND ".join(conditions)
+        self.cursor.execute(query, params)
+        row = self.cursor.fetchone()
+        return row[0]
+    
+    def query_workout_count(self, sort_query):
+        sort_query = f"%{sort_query}%"
+        self.cursor.execute('''SELECT COUNT(*) FROM workouts
+                WHERE title LIKE ? OR sport LIKE ? OR workout_level LIKE ? ''',
+                (sort_query, sort_query, sort_query))
+        row = self.cursor.fetchone()
+        return row[0]
+    
+    
+    def delete_comments(self, workout_id):
+        #could be optimized with foreign keys and cascade delete
+        self.cursor.execute("DELETE FROM comments WHERE workout_id = ?",(workout_id,))
+        self.connection.commit()
+    
+        
     def close(self):
         self.connection.close()
 
