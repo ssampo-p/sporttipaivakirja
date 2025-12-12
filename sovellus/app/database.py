@@ -69,7 +69,6 @@ class Database:
             comment_id = row[3]             
             if comment == "":
                 continue # new posts were getting empty comments, this removes them (don't know yet why they were added)
-            print("rivi:", row[1])
             username = self.get_username_by_id(row[1])
             comments.append((comment, username, sent_at, user_id, comment_id))
         return comments

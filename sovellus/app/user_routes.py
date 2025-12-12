@@ -49,11 +49,9 @@ def register():
         if len(username) > 16: # should not happen
             flash("VIRHE: tunnus liian pitkä!")
             filled = {"username": username}
-            return render_template("register.html", filled=filled)
-        
+            return render_template("register.html", filled=filled)       
         password1 = request.form["password1"]
-        password2 = request.form["password2"]
-        
+        password2 = request.form["password2"]  
         if not password1.strip():
             flash("VIRHE: salasana ei voi olla tyhjä!")
             filled = {"username": username}
@@ -78,7 +76,6 @@ def register():
 
         flash("Tunnuksen luominen onnistui, voit nyt kirjautua sisään")
         return redirect("/")
-    
 
 @users_bp.route("/user_page/<int:user_id>")
 def own_page(user_id):

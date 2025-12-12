@@ -26,7 +26,6 @@ def check_empty_inputs(title, content, path):
 def create_workouts(db, workouts_from_db, workouts):
     for workout in workouts_from_db:
         comments_from_db = db.get_workout_comments(workout[0]) 
-        print(comments_from_db)
         workouts.append(Workout(workout[0],
                                 workout[1],
                                 workout[2],
