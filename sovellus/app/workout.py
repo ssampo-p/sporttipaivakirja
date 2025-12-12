@@ -1,6 +1,10 @@
 class Workout:
-    def __init__(self, id, title, content, sent_at, workout_level, sport, user_id= None, username =None, comments=None,):
-        self.id = id
+    def __init__(self, workout_id, title,
+                 content, sent_at,
+                 workout_level, sport,
+                 user_id= None, username =None,
+                 comments=None,):
+        self.id = workout_id
         self.title = title
         self.content = content
         self.sent_at = sent_at
@@ -11,8 +15,8 @@ class Workout:
         self.comments = comments or []
         
     def add_comment(self, comment):
-        self.comments.append(comment)   
-        
+        self.comments.append(comment)
+             
     def get_comments(self):
         return self.comments
     

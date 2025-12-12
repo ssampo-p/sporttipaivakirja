@@ -1,37 +1,25 @@
-import sqlite3, secrets
-from flask import Flask, Blueprint
-from flask import redirect, render_template, request, session, url_for, abort, flash
+import sqlite3
+import secrets
+from flask import Blueprint, redirect, render_template, request, session, abort, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import Database
-import config
-from datetime import datetime
 from workout import Workout
-import utils 
 
 users_bp = Blueprint('users', __name__)
 @users_bp.route("/login", methods=["POST"])
 def login():
     username = request.form["username"]
-    password = request.form["password"]
-    
-    try:
-        db = Database()
-        user = db.get_user_by_id(username)
-        if user and check_password_hash(user[2], password):
-            session["username"] = username
-            session["user_id"] = user[0]
-            session["csrf_token"] = secrets.token_hex(16)
-            return redirect("/")
-            
-        else:
-            flash("Väärä käyttäjätunnus tai salasana")
-            return redirect("/")
-    except sqlite3.IntegrityError as e:
-        return f"Tapahtui virhe: {e}"
-    finally:
-        redirect("/")
-    
-
+    password = request.form["password"] 
+    db = Database()
+    user = db.get_user_by_id(username)
+    if user and check_password_hash(user[2], password):
+        session["username"] = username
+        session["user_id"] = user[0]
+        session["csrf_token"] = secrets.token_hex(16)
+        return redirect("/")
+    flash("Väärä käyttäjätunnus tai salasana")
+    return redirect("/")
+       
 @users_bp.route("/logout")
 def logout():
     del session["username"]
@@ -82,48 +70,40 @@ def own_page(user_id):
     ''' User's own page , can be accessed only when logged in '''
     if user_id != session["user_id"]:
         return abort(403)
-    username = session["username"]
-    try:
-        db = Database()
-        workouts_from_db = db.get_workouts_by_user(session["user_id"])
-        workouts = []
-        if not workouts_from_db:
-            weekly_count = 0
-            thirty_days_count = 0
-            total_count = db.get_workouts_count(user_id,"all")
-            db.close()
-            return render_template("user_page.html",user_id=user_id,
-                                   username=username,
-                                   workouts=workouts,
-                                   weekly_count=weekly_count,
-                                   thirty_days_count=thirty_days_count,
-                                   total_count=total_count)
-        
-        for workout in workouts_from_db:
-            comments_from_db = db.get_workout_comments(workout[0])  
-            workouts.append(Workout(workout[0],
-                                    workout[1],
-                                    workout[2],
-                                    workout[3],
-                                    workout[4],
-                                    workout[5],
-                                    session["user_id"],
-                                    session["username"],
-                                    comments_from_db,
-                                    ))
-        weekly_count = db.get_workouts_count(user_id,"week")
-        thirty_days_count = db.get_workouts_count(user_id, "30days")
-        total_count = db.get_workouts_count(user_id,"all") 
+    username = session["username"]    
+    db = Database()
+    workouts_from_db = db.get_workouts_by_user(session["user_id"])
+    workouts = []
+    if not workouts_from_db:
+        weekly_count = 0
+        thirty_days_count = 0
+        total_count = db.get_workouts_count(user_id,"all")
         db.close()
         return render_template("user_page.html",user_id=user_id,
                                username=username,
                                workouts=workouts,
                                weekly_count=weekly_count,
                                thirty_days_count=thirty_days_count,
-                               total_count=total_count)
-    except sqlite3.IntegrityError as e:
-        flash("Tapahtui virhe oman sivun lataamisessa!")
-    finally:
-        if db:
-            db.close()
-    
+                               total_count=total_count)       
+    for workout in workouts_from_db:
+        comments_from_db = db.get_workout_comments(workout[0])
+        workouts.append(Workout(workout[0],
+                                workout[1],
+                                workout[2],
+                                workout[3],
+                                workout[4],
+                                workout[5],
+                                session["user_id"],
+                                session["username"],
+                                comments_from_db,
+                                ))
+    weekly_count = db.get_workouts_count(user_id,"week")
+    thirty_days_count = db.get_workouts_count(user_id, "30days")
+    total_count = db.get_workouts_count(user_id,"all") 
+    db.close()
+    return render_template("user_page.html",user_id=user_id,
+                           username=username,
+                           workouts=workouts,
+                           weekly_count=weekly_count,
+                           thirty_days_count=thirty_days_count,
+                           total_count=total_count)

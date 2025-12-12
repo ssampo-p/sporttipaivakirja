@@ -2,20 +2,16 @@
 import sqlite3
 from datetime import datetime
 
-'''
-        Class for handling database operations
-'''
-class Database:
+class Database:  
+    ''' Class for handling database operations '''
     
     def __init__(self):
         self.connection = sqlite3.connect("database.db")
         self.cursor = self.connection.cursor()
         self.create_tables()
         
-    def create_tables(self):
-        
-        ''' Creates necessary tables if they don't exist '''
-        
+    def create_tables(self):     
+        ''' Creates necessary tables if they don't exist '''       
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS workouts (
             id INTEGER PRIMARY KEY,
@@ -27,7 +23,7 @@ class Database:
                 user_id INTEGER REFERENCES users
            );
         """)
-        
+             
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY,
@@ -35,7 +31,7 @@ class Database:
                 password_hash TEXT
             );
         """)
-        
+               
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS comments (
             id INTEGER PRIMARY KEY,
@@ -47,7 +43,6 @@ class Database:
         """)
         self.connection.commit()
     
-    
     def add_comment_to_workout(self, workout_id, user_id, content, sent_at):
         
         self.cursor.execute("""
@@ -57,7 +52,8 @@ class Database:
         self.connection.commit()
         
     def get_workout_comments(self, workout_id):
-        self.cursor.execute("SELECT comment, user_id, sent_at, id FROM comments WHERE workout_id = ?", (workout_id,))       
+        self.cursor.execute("""SELECT comment, user_id, sent_at, id
+                            FROM comments WHERE workout_id = ?""", (workout_id,))       
         rows = self.cursor.fetchall()
         comments = []
         for row in rows:
@@ -66,15 +62,13 @@ class Database:
             sent_at = row[2]
             date = datetime.strptime(sent_at, "%Y-%m-%d %H:%M:%S.%f")
             sent_at = date.strftime("%d.%m.%Y %H:%M")
-            comment_id = row[3]             
+            comment_id = row[3]            
             if comment == "":
                 continue # new posts were getting empty comments, this removes them (don't know yet why they were added)
             username = self.get_username_by_id(row[1])
             comments.append((comment, username, sent_at, user_id, comment_id))
         return comments
-            
-            
-        
+         
     def add_workout(self,content, sent_at, user_id, title, workout_level, sport):
         self.cursor.execute("""
             INSERT INTO workouts (content, sent_at, user_id, title, workout_level, sport)
@@ -90,18 +84,27 @@ class Database:
     def get_workouts_w_page(self, page_num, page_size):
         limit = page_size
         offset = page_size * (page_num - 1)
-        self.cursor.execute('''SELECT id, title, content, sent_at, workout_level,
-                            sport, user_id FROM workouts ORDER BY sent_at DESC LIMIT ? OFFSET ?''', (limit, offset)) 
+        self.cursor.execute("""SELECT id, title, content, sent_at, workout_level,
+                            sport, user_id
+                            FROM workouts
+                            ORDER BY sent_at DESC LIMIT ? OFFSET ?""", (limit, offset)) 
         return self.cursor.fetchall()
     
     
     def get_workouts(self):
-        self.cursor.execute("SELECT id, title, content, sent_at, workout_level, sport, user_id FROM workouts ORDER BY sent_at DESC") 
+        self.cursor.execute("""SELECT id,title,
+                            content, sent_at,
+                            workout_level, sport, user_id
+                            FROM workouts ORDER BY sent_at DESC""") 
         return self.cursor.fetchall()
     
     def get_workouts_by_level(self, workout_level):
-        self.cursor.execute('''SELECT id, title, content, sent_at, workout_level, sport, user_id
-                            FROM workouts WHERE workout_level = ? ORDER BY sent_at DESC''',
+        self.cursor.execute("""SELECT id, title,
+                            content, sent_at,
+                            workout_level, sport, user_id
+                            FROM workouts
+                            WHERE workout_level = ?
+                            ORDER BY sent_at DESC""",
                             (workout_level,))
         return self.cursor.fetchall()
     
@@ -130,9 +133,12 @@ class Database:
         limit = page_size
         offset = page_size * (page_num - 1)
         sort_query = f"%{sort_query}%"
-        self.cursor.execute('''SELECT id, title, content, sent_at,
-                workout_level, sport, user_id FROM workouts
-                WHERE title LIKE ? OR sport LIKE ? OR workout_level LIKE ? ORDER BY sent_at DESC LIMIT ? OFFSET ?''',
+        self.cursor.execute("""SELECT id, title, content, sent_at,
+                            workout_level, sport, user_id
+                            FROM workouts WHERE title LIKE ?
+                            OR sport LIKE ?
+                            OR workout_level LIKE ?
+                            ORDER BY sent_at DESC LIMIT ? OFFSET ?""",
                 (sort_query, sort_query, sort_query, limit, offset))
         return self.cursor.fetchall() 
             
@@ -142,34 +148,34 @@ class Database:
         self.connection.commit()
     
     def get_workouts_by_user(self, user_id):
-        self.cursor.execute('''SELECT id, title, content, sent_at, workout_level, sport
-                            FROM workouts WHERE user_id = ? ORDER BY sent_at DESC'''
+        self.cursor.execute("""SELECT id, title, content, sent_at, workout_level, sport
+                            FROM workouts WHERE user_id = ? ORDER BY sent_at DESC"""
                             , (user_id,))
         return self.cursor.fetchall()
     
-    def edit_workout(self,new_title, new_content, workout_level, sport, workout_id, user_id,):
-        self.cursor.execute('''UPDATE workouts
+    def edit_workout(self, new_title, new_content, workout_level, sport, workout_id, user_id,):
+        self.cursor.execute("""UPDATE workouts
                             SET title = ?, content = ?, workout_level = ?, sport = ?
-                            WHERE id = ? AND user_id = ?''',
+                            WHERE id = ? AND user_id = ?""",
                             (new_title, new_content, workout_level, sport, workout_id, user_id)) 
         self.connection.commit()
-        
-
-    
+  
     def add_user(self, username, password_hash):
-        self.cursor.execute("""
-            INSERT INTO users (username, password_hash)
-            VALUES (?, ?)
-        """, (username, password_hash))
+        self.cursor.execute("""INSERT INTO users (username, password_hash)
+                            VALUES (?, ?)""", (username, password_hash))
         self.connection.commit()
         
     def get_user(self, username):
-        self.cursor.execute("SELECT username, password_hash FROM users WHERE username = ?", (username,))
+        self.cursor.execute("""SELECT username, password_hash
+                            FROM users WHERE username = ?""", (username,))
         return self.cursor.fetchone()
     
     #contains user id now
     def get_user_by_id(self, username):
-        self.cursor.execute("SELECT id, username, password_hash FROM users WHERE username = ?", (username,))
+        self.cursor.execute("""SELECT id, username,
+                            password_hash
+                            FROM users 
+                            WHERE username = ?""", (username,))
         return self.cursor.fetchone()
     
     def get_username_by_id(self, user_id):
@@ -178,20 +184,20 @@ class Database:
         return username[0]
     
     def get_workouts_count(self, user_id, timeperiod):
-            if timeperiod == "week":
-                self.cursor.execute('''SELECT COUNT(*)
-                         FROM workouts WHERE user_id = ? AND sent_at >= datetime('now','-7 days')'''
+        if timeperiod == "week":
+            self.cursor.execute("""SELECT COUNT(*)
+                                FROM workouts WHERE user_id = ? 
+                                AND sent_at >= datetime('now','-7 days')""", (user_id,))
+        elif timeperiod == "month":
+            self.cursor.execute('''SELECT COUNT(*)
+                        FROM workouts WHERE
+                        user_id = ? AND sent_at >= datetime('now','-30 days')'''
                         , (user_id,))
-            elif timeperiod == "month":
-                 self.cursor.execute('''SELECT COUNT(*)
-                         FROM workouts WHERE user_id = ? AND sent_at >= datetime('now','-30 days')'''
-                        , (user_id,))
-            else: 
-                self.cursor.execute("SELECT COUNT(*) FROM workouts WHERE user_id = ?", (user_id,))
+        else: 
+            self.cursor.execute("SELECT COUNT(*) FROM workouts WHERE user_id = ?", (user_id,))    
+        row = self.cursor.fetchone()
+        return row[0]
                 
-            row = self.cursor.fetchone()
-            return row[0] 
-        
     def get_workout_count(self):
         self.cursor.execute("SELECT COUNT(*) FROM workouts")
         row = self.cursor.fetchone()
@@ -217,7 +223,9 @@ class Database:
     def query_workout_count(self, sort_query):
         sort_query = f"%{sort_query}%"
         self.cursor.execute('''SELECT COUNT(*) FROM workouts
-                WHERE title LIKE ? OR sport LIKE ? OR workout_level LIKE ? ''',
+                            WHERE title LIKE ? 
+                            OR sport LIKE ?
+                            OR workout_level LIKE ? ''',
                 (sort_query, sort_query, sort_query))
         row = self.cursor.fetchone()
         return row[0]
@@ -233,5 +241,4 @@ class Database:
         
     def close(self):
         self.connection.close()
-
     
