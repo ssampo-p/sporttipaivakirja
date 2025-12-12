@@ -76,8 +76,6 @@ def workouts(page_num):
 
 
 @workouts_bp.route("/comment_post/<int:workout_id>", methods=["POST"])
-
-
 def comment_post(workout_id):
     ''' Creates a new comment on a workout post '''
     if "user_id" not in session:
@@ -87,10 +85,22 @@ def comment_post(workout_id):
     if not comment_content.strip() or len(comment_content) > 500:
         flash("Et voi lähettää tyhjää kommenttia!")
         return redirect(url_for("workouts.workouts"))
+    sent_at = datetime.now().isoformat(" ")
     db = Database()
-    db.add_comment_to_workout(workout_id, session["user_id"], comment_content)
+    db.add_comment_to_workout(workout_id, session["user_id"], comment_content, sent_at)
     db.close()
     return_to_same = request.form.get("return_to_same") # hidden input to return to same page after comment    
+    return redirect(return_to_same if return_to_same else url_for("workouts.workouts"))
+
+@workouts_bp.route("/delete_comment/<int:comment_id>/<int:comment_user_id>", methods=["POST"])
+def delete_comment(comment_id, comment_user_id):
+    if comment_user_id != session["user_id"]:
+        abort(403)
+    utils.check_csrf()
+    db = Database()
+    db.delete_comment(comment_id)
+    db.close()
+    return_to_same = request.form.get("return_to_same")
     return redirect(return_to_same if return_to_same else url_for("workouts.workouts"))
 
 @workouts_bp.route("/edit_workout/<int:workout_id>/<int:workout_user_id>", methods=["POST", "GET"])

@@ -93,8 +93,14 @@ def own_page(user_id):
         if not workouts_from_db:
             weekly_count = 0
             thirty_days_count = 0
+            total_count = db.get_workouts_count(user_id,"all")
             db.close()
-            return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts, weekly_count=weekly_count, thirty_days_count=thirty_days_count)
+            return render_template("user_page.html",user_id=user_id,
+                                   username=username,
+                                   workouts=workouts,
+                                   weekly_count=weekly_count,
+                                   thirty_days_count=thirty_days_count,
+                                   total_count=total_count)
         
         for workout in workouts_from_db:
             comments_from_db = db.get_workout_comments(workout[0])  
@@ -109,9 +115,15 @@ def own_page(user_id):
                                     comments_from_db,
                                     ))
         weekly_count = db.get_workouts_count(user_id,"week")
-        thirty_days_count = db.get_workouts_count(user_id, "30days") 
+        thirty_days_count = db.get_workouts_count(user_id, "30days")
+        total_count = db.get_workouts_count(user_id,"all") 
         db.close()
-        return render_template("user_page.html",user_id=user_id, username=username, workouts=workouts, weekly_count=weekly_count, thirty_days_count=thirty_days_count)
+        return render_template("user_page.html",user_id=user_id,
+                               username=username,
+                               workouts=workouts,
+                               weekly_count=weekly_count,
+                               thirty_days_count=thirty_days_count,
+                               total_count=total_count)
     except sqlite3.IntegrityError as e:
         flash("Tapahtui virhe oman sivun lataamisessa!")
     finally:

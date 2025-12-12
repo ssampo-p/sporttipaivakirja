@@ -77,7 +77,15 @@
                     {% for comment in workout.get_comments() %}
                     <div class="comment">
                         <p>{{ comment[0] | show_lines }}</p>
-                        <small>Käyttäjältä: {{ comment[1] }}</small>
+                        <small>Käyttäjältä: {{ comment[1] }}, kommentoitu: {{comment[2]}}</small>
+                        {%if session.user_id == comment[3]%}
+                            <form method="post" action = "{{ url_for("workouts.delete_comment", comment_id=comment[4],
+                                                        comment_user_id=comment[3])}}">
+                                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                                <input type="hidden" name="return_to_same" value="{{request.full_path}}">
+                                <input type="submit" value="Poista kommentti">
+                            </form>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </article>
@@ -114,7 +122,7 @@
         <p>Kirjaudu tai rekisteröidy kommentoidaksesi suorituksia</p>
         <p><a href="/register">Rekisteröidy</a></p>
         <p><a href="/">Kirjaudu etusivulta </a></p>
-    {%endif%}
+    {% endif %}
 </body>
 </html>
 

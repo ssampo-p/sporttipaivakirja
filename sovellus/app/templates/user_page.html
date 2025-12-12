@@ -11,6 +11,7 @@
       <div class="user-stats">
         <p>Olet harjoitellut viimeisen 7 päivän aikana: {{weekly_count}} kertaa</p>
         <p>Olet harjoitellut viimeisen 30 päivän aikana: {{thirty_days_count}} kertaa</p>
+        <p>Kaikkiaan olet harjoitellut: {{total_count}} kertaa</p>
       </div>
       <hr>
       <p>Viimeisimmät urheilusuorituksesi:</p>
@@ -24,7 +25,16 @@
                     {% for comment in workout.get_comments() %}
                     <div class="comment">
                         <p >{{ comment[0] | show_lines}}</p>
-                        <small>Käyttäjältä: {{ comment[1] }}</small>
+                        <small>Käyttäjältä: {{ comment[1] }}, kommentoitu: {{comment[2]}}</small>
+                        {%if session.user_id == comment[3]%}
+                            <!--same form again, could be done with a macro or include-->
+                            <form method="post" action = "{{ url_for("workouts.delete_comment", comment_id=comment[4],
+                                                        comment_user_id=comment[3])}}">
+                                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                                <input type="hidden" name="return_to_same" value="{{request.full_path}}">
+                                <input type="submit" value="Poista kommentti">
+                            </form>
+                        {% endif %}
                     </div>
                 {% endfor %}
               <form method="post" action="{{ url_for('workouts.edit_workout', workout_id=workout.id, workout_user_id=workout.user_id) }}">

@@ -1,6 +1,6 @@
 
 import sqlite3
-
+from datetime import datetime
 
 '''
         Class for handling database operations
@@ -41,31 +41,37 @@ class Database:
             id INTEGER PRIMARY KEY,
                 comment TEXT,
                 user_id INTEGER REFERENCES users,
-                workout_id INTEGER REFERENCES workouts
+                workout_id INTEGER REFERENCES workouts,
+                sent_at TEXT
             );
         """)
         self.connection.commit()
     
     
-    def add_comment_to_workout(self, workout_id, user_id, content):
+    def add_comment_to_workout(self, workout_id, user_id, content, sent_at):
         
         self.cursor.execute("""
-            INSERT INTO comments (comment, user_id, workout_id)
-            VALUES (?, ?, ?)
-        """, (content, user_id, workout_id))
+            INSERT INTO comments (comment, user_id, workout_id, sent_at)
+            VALUES (?, ?, ?, ?)
+        """, (content, user_id, workout_id, sent_at))
         self.connection.commit()
         
     def get_workout_comments(self, workout_id):
-        self.cursor.execute("SELECT comment, user_id FROM comments WHERE workout_id = ?", (workout_id,))       
+        self.cursor.execute("SELECT comment, user_id, sent_at, id FROM comments WHERE workout_id = ?", (workout_id,))       
         rows = self.cursor.fetchall()
         comments = []
         for row in rows:
-            comment = row[0].strip() 
+            comment = row[0].strip()
+            user_id = row[1]
+            sent_at = row[2]
+            date = datetime.strptime(sent_at, "%Y-%m-%d %H:%M:%S.%f")
+            sent_at = date.strftime("%d.%m.%Y %H:%M")
+            comment_id = row[3]             
             if comment == "":
                 continue # new posts were getting empty comments, this removes them (don't know yet why they were added)
             print("rivi:", row[1])
             username = self.get_username_by_id(row[1])
-            comments.append((comment, username))
+            comments.append((comment, username, sent_at, user_id, comment_id))
         return comments
             
             
@@ -177,10 +183,13 @@ class Database:
                 self.cursor.execute('''SELECT COUNT(*)
                          FROM workouts WHERE user_id = ? AND sent_at >= datetime('now','-7 days')'''
                         , (user_id,))
-            else:
+            elif timeperiod == "month":
                  self.cursor.execute('''SELECT COUNT(*)
                          FROM workouts WHERE user_id = ? AND sent_at >= datetime('now','-30 days')'''
                         , (user_id,))
+            else: 
+                self.cursor.execute("SELECT COUNT(*) FROM workouts WHERE user_id = ?", (user_id,))
+                
             row = self.cursor.fetchone()
             return row[0] 
         
@@ -219,7 +228,9 @@ class Database:
         #could be optimized with foreign keys and cascade delete
         self.cursor.execute("DELETE FROM comments WHERE workout_id = ?",(workout_id,))
         self.connection.commit()
-    
+    def delete_comment(self, comment_id):
+        self.cursor.execute("DELETE FROM comments WHERE id = ?",(comment_id,))
+        self.connection.commit()
         
     def close(self):
         self.connection.close()

@@ -16,5 +16,6 @@ CREATE TABLE comments (
             id INTEGER PRIMARY KEY,
                 comment TEXT,
                 user_id INTEGER REFERENCES users,
-                workout_id INTEGER REFERENCES workouts
+                workout_id INTEGER REFERENCES workouts,
+                sent_at TEXT
             );
