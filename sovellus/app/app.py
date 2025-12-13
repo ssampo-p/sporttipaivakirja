@@ -30,3 +30,7 @@ def sivu1():
     db = Database()
     db.close()
     return render_template("index.html", filled={})
+
+@app.errorhandler(403)
+def forbidden(_):
+    return render_template("403.html"), 403
