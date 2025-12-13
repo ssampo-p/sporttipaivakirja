@@ -34,8 +34,11 @@ def register():
 
     if request.method == "POST":
         username = request.form["username"]
-        if len(username) > 16: # should not happen
-            flash("VIRHE: tunnus liian pitkä!")
+        if len(username) > 16 or len(username) <= 0:
+            if len(username) > 16:
+                flash("VIRHE: tunnus liian pitkä!")
+            else:
+                flash("VIRHE: tunnus ei voi olla tyhjä")
             filled = {"username": username}
             return render_template("register.html", filled=filled)       
         password1 = request.form["password1"]
