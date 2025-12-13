@@ -16,18 +16,15 @@
             <fieldset>
                 <legend>Valitse suorituksen taso:</legend>
                 <div>
-
                   <input type="radio"  name="workout_level" value="helppo" 
                   {%if workout.workout_level == "helppo"%} checked {%endif%}>
                   <label for="helppo">Helppo</label>
                 </div>
-            
                 <div>
                   <input type="radio"  name="workout_level" value="keskitaso"
                   {%if workout.workout_level == "keskitaso"%}checked{%endif%}>
                   <label for="keskitaso">Keskitaso</label>
-                </div>
-            
+                </div>      
                 <div>
                   <input type="radio" name="workout_level" value="kova"
                   {%if workout.workout_level == "kova"%}checked{%endif%}>
@@ -45,7 +42,6 @@
                         "Kamppailu": "Kamppailu",
                         "Muu": "Muu"
                     }%}
-
                 <label for="workout_type">Valitse laji:</label>
                 <select name="workout_type" id="workout_type">
                     {% for key, label in workout_types.items() %}

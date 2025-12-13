@@ -18,25 +18,25 @@
         {% if workouts %}
           {% for workout in workouts %}
             <article class="workouts">
-              <h3>{{ workout.title }}, Taso: {{ workout.workout_level }}, Laji {{ workout.sport }}</h3>
+              <h3>{{ workout.title }}, Taso: {{ workout.workout_level }}, Laji: {{ workout.sport }}</h3>
               <p>{{ workout.content | show_lines }}</p>
               <small>Lisätty: {{ workout.sent_at }}</small>
               <h2>Kommentit: </h2>
-                    {% for comment in workout.get_comments() %}
+                  {% for comment in workout.get_comments() %}
                     <div class="comment">
-                        <p >{{ comment[0] | show_lines}}</p>
-                        <small>Käyttäjältä: {{ comment[1] }}, kommentoitu: {{comment[2]}}</small>
-                        {%if session.user_id == comment[3]%}
-                            <!--same form again, could be done with a macro or include-->
+                      <p >{{ comment[0] | show_lines}}</p>
+                      <small>Käyttäjältä: {{ comment[1] }}, kommentoitu: {{comment[2]}}</small>
+                      {%if session.user_id == comment[3]%}
+                          <!--same form again, could be done with a macro or include-->
                             <form method="post" action = "{{ url_for("workouts.delete_comment", comment_id=comment[4],
-                                                        comment_user_id=comment[3])}}">
+                                                          comment_user_id=comment[3])}}">
                                 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                                 <input type="hidden" name="return_to_same" value="{{request.full_path}}">
                                 <input type="submit" value="Poista kommentti">
                             </form>
                         {% endif %}
                     </div>
-                {% endfor %}
+                  {% endfor %}
               <form method="post" action="{{ url_for('workouts.edit_workout', workout_id=workout.id, workout_user_id=workout.user_id) }}">
                 <button class="button edit-button" type="submit">Muokkaa</button>
                 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
