@@ -58,6 +58,11 @@
         <button type="submit"> Lajittele hakusanalla </button>    
     </form>
     <br>
+    <form method="get" action="{{url_for("workouts.all_workouts", page_num=1)}}">
+        <button type="submit">Nollaa haut</button>    
+    </form>
+    <br>
+    
     {%include "flash_msg.html"%}
     {% for workout in workouts %}
         <article class="workouts-outer" >
