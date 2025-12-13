@@ -24,7 +24,6 @@ def after_request(response):
     print("elapsed time:", elapsed_time, "s")
     return response
 
-
 @app.route("/")
 def sivu1():
     db = Database()
@@ -34,3 +33,7 @@ def sivu1():
 @app.errorhandler(403)
 def forbidden(_):
     return render_template("403.html"), 403
+
+@app.errorhandler(404)
+def page_not_found(_):
+  return render_template('404.html'), 404
