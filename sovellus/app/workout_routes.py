@@ -71,15 +71,16 @@ def comment_post(workout_id):
         return redirect("/")
     utils.check_csrf()
     comment_content = request.form["comment_content"]
+    return_to_same = request.form.get("return_to_same")
     if not comment_content.strip() or len(comment_content) > 500:
         flash("Et voi lähettää tyhjää kommenttia!")
-        return redirect(url_for("workouts.all_workouts"))
+        return redirect(return_to_same)
     sent_at = datetime.now().isoformat(" ")
     db = Database()
     db.add_comment_to_workout(workout_id, session["user_id"], comment_content, sent_at)
     db.close()
-    return_to_same = request.form.get("return_to_same") # hidden input to return to same page after comment    
-    return redirect(return_to_same if return_to_same else url_for("workouts.all_workouts"))
+     # hidden input to return to same page after comment    
+    return redirect(return_to_same if return_to_same else url_for("workouts.all_workouts", page_num=1))
 
 @workouts_bp.route("/delete_comment/<int:comment_id>/<int:comment_user_id>", methods=["POST"])
 def delete_comment(comment_id, comment_user_id):
@@ -90,7 +91,7 @@ def delete_comment(comment_id, comment_user_id):
     db.delete_comment(comment_id)
     db.close()
     return_to_same = request.form.get("return_to_same")
-    return redirect(return_to_same if return_to_same else url_for("workouts.all_workouts"))
+    return redirect(return_to_same if return_to_same else url_for("workouts.all_workouts", page_num=1))
 
 @workouts_bp.route("/edit_workout/<int:workout_id>/<int:workout_user_id>", methods=["POST", "GET"])
 def edit_workout(workout_id, workout_user_id):

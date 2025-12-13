@@ -120,3 +120,8 @@
          padding: 10px;
          margin: 2px;
     }
+    .flash-msg{
+        font-size: 20;
+        font-weight: bold;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }

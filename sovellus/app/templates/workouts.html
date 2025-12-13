@@ -87,7 +87,7 @@
                             <form method="post" action = "{{ url_for("workouts.delete_comment", comment_id=comment[4],
                                                         comment_user_id=comment[3])}}">
                                 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-                                <input type="hidden" name="return_to_same" value="{{request.full_path}}">
+                                <input type="hidden" name="return_to_same" value="{{ request.full_path }}">
                                 <input type="submit" value="Poista kommentti">
                             </form>
                         {% endif %}
