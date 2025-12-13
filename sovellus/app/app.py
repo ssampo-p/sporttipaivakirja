@@ -6,8 +6,6 @@ from utils import show_lines
 from workout_routes import workouts_bp
 from user_routes import users_bp
 
-
-
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
 app.register_blueprint(workouts_bp)
