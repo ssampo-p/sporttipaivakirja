@@ -23,6 +23,19 @@ def check_empty_inputs(title, content, path):
         return redirect(path)
     return None
 
+def check_new_workout(title, content):
+    filled = {
+        "title": title,
+        "content": content
+    }
+    if not title.strip():
+        flash("Postauksen täytyy sisältää otsikko !")
+        return render_template("index.html", filled=filled )
+    if not content.strip():
+        flash("Postauksen täytyy sisältää viesti !")
+        return render_template("index.html", filled=filled)
+    return None
+
 def create_workouts(db, workouts_from_db, workouts):
     for workout in workouts_from_db:
         comments_from_db = db.get_workout_comments(workout[0])

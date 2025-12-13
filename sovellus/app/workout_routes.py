@@ -21,7 +21,7 @@ def new_workout_post():
     title = request.form["title"]
     workout_level = request.form["workout_level"]
     sport = request.form["workout_type"]
-    check = utils.check_empty_inputs(title, content, "/")
+    check = utils.check_new_workout(title, content)
     if check:
         return check
     if not title or len(title) > 100 or len(content) > 5000:

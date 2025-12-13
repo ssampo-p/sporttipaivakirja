@@ -22,11 +22,11 @@
           <legend> Uusi Urheilusuoritus</legend>
           <p>
             <label for="title">Otsikko: </label><br />
-            <input type="text" name="title" />
+            <input type="text" value="{{ filled.title }}"name="title" />
           </p>
           <p>
             <label for="content">Kuvaus: </label><br />
-            <textarea name="content" rows="7" cols="50"></textarea>
+            <textarea name="content" rows="7" cols="50">{{ filled.content }}</textarea>
           </p>
    
           <fieldset class="fieldset">
