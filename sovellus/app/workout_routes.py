@@ -104,6 +104,8 @@ def edit_workout(workout_id, workout_user_id):
     db = Database()
     workout_from_db = db.get_workout(workout_id)
     #TODO not the best way create workout obj..
+    if workout_from_db == None or len(workout_from_db) == 0: # fixes type error
+        return redirect("/")  
     workout = Workout(workout_from_db[0],
             workout_from_db[1],
             workout_from_db[2],
