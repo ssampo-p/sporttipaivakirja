@@ -71,7 +71,9 @@ def register():
 @users_bp.route("/user_page/<int:user_id>")
 def own_page(user_id):
     ''' User's own page , can be accessed only when logged in '''
-    if user_id != session["user_id"]:
+    if "user_id" not in session:
+        return abort(403)
+    if session["user_id"] != user_id:
         return abort(403)
     username = session["username"]    
     db = Database()

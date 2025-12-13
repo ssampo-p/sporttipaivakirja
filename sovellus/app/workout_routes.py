@@ -95,6 +95,8 @@ def delete_comment(comment_id, comment_user_id):
 
 @workouts_bp.route("/edit_workout/<int:workout_id>/<int:workout_user_id>", methods=["POST", "GET"])
 def edit_workout(workout_id, workout_user_id):
+    if "user_id" not in session:
+        abort(403)
     if workout_user_id != session["user_id"]:
         abort(403)
     if request.method == "POST": # to show the edit form if check_empty_inputs fails
