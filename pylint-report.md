@@ -180,7 +180,7 @@ workout_routes.py:208:0: C0116: Missing function or method docstring (missing-fu
 user_routes.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 ```
 
-Nämä ilmoitukset tarkoittavat sitä, että moduuleissa/luokissa/funktioissa/metodeissa ei ole docstring kommentteja. Nämä on jätetty pois koska sovelluksen kehityksessä on pyritty käyttämään kuvaavia nimiä moduuleissa, luokissa, funktioissa ja metodeissa. Myös ajankäytölliset syyt ovat mukana poisjättämisessä.
+Nämä ilmoitukset tarkoittavat sitä, että moduuleissa/luokissa/funktioissa/metodeissa ei ole docstring kommentteja. Nämä on jätetty pois koska sovelluksen kehityksessä on pyritty käyttämään kuvaavia nimiä moduuleissa, luokissa, funktioissa ja metodeissa. Myös ajankäytölliset syyt ja sovelluksen yksinkertaisuus ovat mukana poisjättämisessä.
 
 ## Too many public methods ilmoitus
 ```
@@ -195,7 +195,7 @@ database.py:155:4: R0913: Too many arguments (7/5) (too-many-arguments)
 database.py:155:4: R0917: Too many positional arguments (7/5) (too-many-positional-arguments)
 workout.py:2:4: R0917: Too many positional arguments (10/5) (too-many-positional-arguments)
 ```
-Nämä ilmoitukset johtuvat siitä, että argumenttejä/positionaalisia argumenttjä on käytössä liikaa, mutta esimerkiksi kun lisätään tietokannan tauluun rivi, voi pylintin maksimimäärä `5` ylittyä. Tämän voisi korjata esimerkiksi jollai toisella tavalla välittää data tälle metodille kuten listana tai oliona mutta tässä tilanteessa se on tietoisesti jätetty tekemättä. 
+Nämä ilmoitukset johtuvat siitä, että argumenttejä/positionaalisia argumenttjä on käytössä liikaa, mutta esimerkiksi kun lisätään tietokannan tauluun rivi, voi pylintin maksimimäärä `5` ylittyä. Tämän voisi korjata esimerkiksi jollain toisella tavalla välittää data tälle metodille, kuten listana tai oliona mutta tässä tilanteessa se on tietoisesti jätetty tekemättä. 
 
 ## TODO ilmoitukset
 Nämä ilmestyvät koska `TODO` kommentit ovat jätetty sovellukseen. Nämä kommentit ovat mahdollista jatkokehitystä varten.
@@ -252,7 +252,7 @@ def register():
         flash("Tunnuksen luominen onnistui, voit nyt kirjautua sisään")
         return redirect("/")
 ```
-Tässä funktio palauttaa arvon, kun `request.method` on `GET` tai `POST`, mutta periaatteessa voisi tulla tilanne, jossa `request.method` on jokin muu ja funktio ei palauttaisi sitten mitään. Koska kuitenkin funktion dekoraattorissa on vaatimus, että metodin tulee olla `GET` tai `POST` niin muilla metodeilla ei tähän funktioon edes pääsisi mikä käytännössä poistaa ongelman, että mitää ei palautuisi.
+Tässä funktio palauttaa arvon, kun `request.method` on `GET` tai `POST`, mutta periaatteessa voisi tulla tilanne, jossa `request.method` on jokin muu ja funktio ei palauttaisi sitten mitään. Koska kuitenkin funktion dekoraattorissa on vaatimus, että metodin tulee olla `GET` tai `POST`, niin muilla metodeilla ei tähän funktioon edes pääsisi, mikä käytännössä poistaa ongelman, että mitää ei palautuisi.
 
 ## Ilmotukset liian pitkistä riveistä
 Esimerkiksi 
